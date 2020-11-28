@@ -5,6 +5,14 @@ import Button from '@material-ui/core/Button';
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
 
+const content = [
+  ["A1","B1","C1"],
+  ["A2","B2","C2"]
+]
+
+
+
+
 interface article {
   title: string;
   url: string;
@@ -43,20 +51,30 @@ const List = () => {
         <span>{item.num_comments}</span>
         <span>{item.points}</span>
         <span>END</span>
-        <Button variant="contained" color="primary">
-          Hello World
-        </Button>
       </div>)
    );
 }
 
+const Table1 = () => {
+  return content.map((row, rowNumber) => (
+        <input type="text" name="name" onChange={event => console.log(rowNumber, event.target.value)}/>
+  ))
+}
+
 
 const App = () => {
+
+  const handleChange = event => {
+    console.log(event.target.value);
+  }
+
   return (
     <div>
-    <h1>Hi</h1>
+      <label htmlFor="search">Search: </label>
+      <input id="search" type="text" onChange={handleChange} />
     <hr />
     <List />
+    <Table1 />
     </div>
   );
 }
