@@ -5,11 +5,6 @@ import Button from '@material-ui/core/Button';
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
 
-const content = [
-  ["A1","B1","C1"],
-  ["A2","B2","C2"]
-]
-
 
 
 
@@ -41,7 +36,7 @@ const Table1 = (props) => {
   return props.content.map((row, rowNumber) => (
       <div>
       {row.map((cell, columnNumber) =>
-            <input type="text" value={cell} name="name" onChange={event => console.log(rowNumber, columnNumber, event.target.value)}/>
+            <input type="text" value={cell} key={rowNumber + "," + columnNumber} name="name" onChange={event => console.log(rowNumber, columnNumber, event.target.value)}/>
           )}
       </div>
   ))
@@ -50,6 +45,13 @@ const Table1 = (props) => {
 
 const App = () => {
 
+
+  const content = [
+    ["A1","B1","C1"],
+    ["A2","B2","C2"]
+  ]
+
+  const [searchTerm, setSearchTerm] = React.useState('');
 
   const stories = [
     {

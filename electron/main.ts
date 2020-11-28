@@ -2,7 +2,12 @@ import { app, BrowserWindow } from "electron";
 import * as path from "path";
 import * as url from "url";
 
+
 let mainWindow: Electron.BrowserWindow | null;
+
+if (module.hot) {
+  module.hot.accept();
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
