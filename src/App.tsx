@@ -17,56 +17,65 @@ interface article {
   objectID: number;
 }
 
+const Item = ({title, url, author, num_comments, points, objectID}: article) => (
+  <div>
+    <span>
+      <a href={url}>{item.title}</a>
+    </span>
+    <span>{author}</span>
+    <span>{num_comments}</span>
+    <span>{points}</span>
+  </div>
+);
+
 type ListProps = {
   list: Array<article>
 }
 
-const List = (props: ListProps) => {
-   return props.list.map((item: article) =>  (
-        <div key={item.objectID}>
-        <span>
-          <a href={item.url}>{item.title}</a>
-        </span>
-        <span>{item.author}</span>
-        <span>{item.num_comments}</span>
-        <span>{item.points}</span>
-        <span>END</span>
-      </div>)
-   );
-}
+const List = ({list}: ListProps) =>
+    list.map(({objectID, ...item}: article)
+      => <Item key={objectID} {...item} />);
+
 
 type Table1props = {
+  header: Array<string>,
   content: Array<Array<string>>,
 }
 
-const Table1 = (props: Table1props) => {
-  return props.content.map((row, rowNumber) => (
-      <div>
-      {row.map((cell, columnNumber) =>
-            <input type="text" value={cell} key={rowNumber + "," + columnNumber}
-                   name="name"
-                   onChange={event => console.log(rowNumber, columnNumber, event.target.value)}/>
-          )}
+const Table1 = ({header, content}: Table1props) => {
+  const alphabet = ["A", "B", "C", "D", "E", "F", "G"];
+  return (<div>
+      <div><span key="corner1"></span>
+      {header.map((cell, columnNumber) => (<span key={"label " + columnNumber}>{alphabet[columnNumber]}</span>))}
       </div>
-  ))
+      <div><span key="corner2"></span>
+      {header.map((cell, columnNumber) => (<span key={"header " + columnNumber}>{cell}</span>))}
+      </div>
+      {content.map((row, rowNumber) => (
+      <div>
+        {row.map((cell, columnNumber) =>
+              <input type="text" value={cell} key={rowNumber + "," + columnNumber}
+                     name="name"
+                     onChange={event => console.log(rowNumber, columnNumber, event.target.value)}/>
+         )}
+     </div>))} </div> )
 }
 
 type SearchProps = {
+  search: string,
   onSearch: (event: React.ChangeEvent<HTMLInputElement>) => void,
 }
 
-const Search = (props: SearchProps) => {
-  const [searchTerm, setSearchTerm] = React.useState('');
-
-  return(<div>
+const Search = ({search, onSearch}: SearchProps) =>
+  (<div>
     <label htmlFor="search">Search: </label>
-    <input id="search" type="text" onChange={props.onSearch} />
-
-  </div>)
-}
+    <input id="search" type="text" value={search} onChange={onSearch} />
+  </div>);
 
 
 const App = () => {
+
+  const contentheader = ["Alabel", "Blabel", "Clabel" ]
   const content = [
     ["A1","B1","C1"],
     ["A2","B2","C2"]
@@ -90,7 +99,7 @@ const App = () => {
     },
   ];
 
-  const [searchTerm, setSearchTerm] = React.useState('');
+  const [searchTerm, setSearchTerm] = React.useState('React');
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>)  => {
     setSearchTerm(event.target.value);
@@ -102,11 +111,11 @@ const App = () => {
 
   return (
     <div>
-      <Search onSearch={handleSearch}/>
+      <Search search={searchTerm} onSearch={handleSearch}/>
       <p>Searching for <strong>{searchTerm}</strong></p>
       <hr />
       <List list={searchedStories} />
-      <Table1 content={content}/>
+      <Table1 content={content} header={contentheader}/>
     </div>
   );
 }
