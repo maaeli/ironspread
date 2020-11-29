@@ -17,8 +17,11 @@ interface article {
   objectID: number;
 }
 
+type ListProps = {
+  list: Array<article>
+}
 
-const List = (props) => {
+const List = (props: ListProps) => {
    return props.list.map((item: article) =>  (
         <div key={item.objectID}>
         <span>
@@ -32,27 +35,42 @@ const List = (props) => {
    );
 }
 
-const Table1 = (props) => {
+type Table1props = {
+  content: Array<Array<string>>,
+}
+
+const Table1 = (props: Table1props) => {
   return props.content.map((row, rowNumber) => (
       <div>
       {row.map((cell, columnNumber) =>
-            <input type="text" value={cell} key={rowNumber + "," + columnNumber} name="name" onChange={event => console.log(rowNumber, columnNumber, event.target.value)}/>
+            <input type="text" value={cell} key={rowNumber + "," + columnNumber}
+                   name="name"
+                   onChange={event => console.log(rowNumber, columnNumber, event.target.value)}/>
           )}
       </div>
   ))
 }
 
+type SearchProps = {
+  onSearch: (event: React.ChangeEvent<HTMLInputElement>) => void,
+}
+
+const Search = (props: SearchProps) => {
+  const [searchTerm, setSearchTerm] = React.useState('');
+
+  return(<div>
+    <label htmlFor="search">Search: </label>
+    <input id="search" type="text" onChange={props.onSearch} />
+
+  </div>)
+}
+
 
 const App = () => {
-
-
   const content = [
     ["A1","B1","C1"],
     ["A2","B2","C2"]
   ]
-
-  const [searchTerm, setSearchTerm] = React.useState('');
-
   const stories = [
     {
       title: 'React',
@@ -72,17 +90,23 @@ const App = () => {
     },
   ];
 
-  const handleChange = event => {
-    console.log(event.target.value);
-  }
+  const [searchTerm, setSearchTerm] = React.useState('');
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>)  => {
+    setSearchTerm(event.target.value);
+  };
+
+  const searchedStories = stories.filter((story: article) => {
+    return story.title.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   return (
     <div>
-      <label htmlFor="search">Search: </label>
-      <input id="search" type="text" onChange={handleChange} />
-    <hr />
-    <List list={stories} />
-    <Table1 content={content}/>
+      <Search onSearch={handleSearch}/>
+      <p>Searching for <strong>{searchTerm}</strong></p>
+      <hr />
+      <List list={searchedStories} />
+      <Table1 content={content}/>
     </div>
   );
 }
