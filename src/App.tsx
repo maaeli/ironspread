@@ -5,7 +5,15 @@ import Button from '@material-ui/core/Button';
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
 
+const useSemiPersistentState = (key: string, initialState: any) => {
+  const [value, setValue] = React.useState(
+    localStorage.getItem(key) || initialState
+  );
 
+  React.useEffect(() => {localStorage.setItem(key, value);}, [value, key]);
+
+  return [value, setValue];
+};
 
 
 interface article {
@@ -20,7 +28,7 @@ interface article {
 const Item = ({title, url, author, num_comments, points, objectID}: article) => (
   <div>
     <span>
-      <a href={url}>{item.title}</a>
+      <a href={url}>{title}</a>
     </span>
     <span>{author}</span>
     <span>{num_comments}</span>
@@ -32,9 +40,8 @@ type ListProps = {
   list: Array<article>
 }
 
-const List = ({list}: ListProps) =>
-    list.map(({objectID, ...item}: article)
-      => <Item key={objectID} {...item} />);
+const List = ({list}: ListProps) => (
+    list.map(({objectID, ...item}: article) => (<Item key={objectID} {...item} />)));
 
 
 type Table1props = {
@@ -99,7 +106,7 @@ const App = () => {
     },
   ];
 
-  const [searchTerm, setSearchTerm] = React.useState('React');
+  const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>)  => {
     setSearchTerm(event.target.value);
