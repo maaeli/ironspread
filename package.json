@@ -30,6 +30,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "check-types": "tsc",
     "dev:electron": "NODE_ENV=development webpack --config webpack.electron.config.js --mode development && electron .",
     "dev:react": "NODE_ENV=development webpack serve --config webpack.react.config.js --mode development",
     "dev": "concurrently \"npm run dev:react \" \"wait-on http://localhost:4000 && npm run dev:electron\""

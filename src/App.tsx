@@ -1,4 +1,4 @@
-import React from 'react';
+import React,  { FunctionComponent, ReactChild, ReactChildren } from 'react';
 import ReactDom from 'react-dom';
 import Button from '@material-ui/core/Button';
 
@@ -25,7 +25,7 @@ interface article {
   objectID: number;
 }
 
-const Item = ({title, url, author, num_comments, points, objectID}: article) => (
+const Item: FunctionComponent<article> = ({title, url, author, num_comments, points, objectID}) => (
   <div>
     <span>
       <a href={url}>{title}</a>
@@ -40,8 +40,8 @@ type ListProps = {
   list: Array<article>
 }
 
-const List = ({list}: ListProps) => (
-    list.map(({objectID, ...item}: article) => (<Item key={objectID} {...item} />)));
+const List: FunctionComponent<ListProps>  = ({list}: ListProps) => (<>
+    {list.map((item: article) => (<Item key={item.objectID} {...item} />))}</>);
 
 
 type Table1props = {
@@ -49,7 +49,7 @@ type Table1props = {
   content: Array<Array<string>>,
 }
 
-const Table1 = ({header, content}: Table1props) => {
+const Table1: FunctionComponent<Table1props> = ({header, content}: Table1props) => {
   const alphabet = ["A", "B", "C", "D", "E", "F", "G"];
   return (<div>
       <div><span key="corner1"></span>
@@ -68,16 +68,20 @@ const Table1 = ({header, content}: Table1props) => {
      </div>))} </div> )
 }
 
-type SearchProps = {
-  search: string,
-  onSearch: (event: React.ChangeEvent<HTMLInputElement>) => void,
+type InputWithLabelProps = {
+  id: string,
+  label?: string,
+  type?: string,
+  value: string,
+  onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
+  children?: ReactChild | ReactChildren;
 }
 
-const Search = ({search, onSearch}: SearchProps) =>
-  (<div>
-    <label htmlFor="search">Search: </label>
-    <input id="search" type="text" value={search} onChange={onSearch} />
-  </div>);
+const InputWithLabel = ({id, label, type="text", value, onInputChange, children}: InputWithLabelProps) =>
+  (<>
+    <label htmlFor={id}>{children}</label>
+    <input id={id} type={type} value={value} onChange={onInputChange} />
+  </>);
 
 
 const App = () => {
@@ -118,7 +122,7 @@ const App = () => {
 
   return (
     <div>
-      <Search search={searchTerm} onSearch={handleSearch}/>
+      <InputWithLabel id="search"  value={searchTerm} onInputChange={handleSearch}>Search: </InputWithLabel>
       <p>Searching for <strong>{searchTerm}</strong></p>
       <hr />
       <List list={searchedStories} />
