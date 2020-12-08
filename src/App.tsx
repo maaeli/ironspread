@@ -51,21 +51,21 @@ type Table1props = {
 
 const Table1: FunctionComponent<Table1props> = ({header, content}: Table1props) => {
   const alphabet = ["A", "B", "C", "D", "E", "F", "G"];
-  return (<div>
-      <div><span key="corner1"></span>
+  return (<>
+      <div key="labels"><span key="corner1"></span>
       {header.map((cell, columnNumber) => (<span key={"label " + columnNumber}>{alphabet[columnNumber]}</span>))}
       </div>
-      <div><span key="corner2"></span>
+      <div key="headers"><span key="corner2"></span>
       {header.map((cell, columnNumber) => (<span key={"header " + columnNumber}>{cell}</span>))}
       </div>
       {content.map((row, rowNumber) => (
-      <div>
+      <div key={"row" + rowNumber}>
         {row.map((cell, columnNumber) =>
               <input type="text" value={cell} key={rowNumber + "," + columnNumber}
                      name="name"
                      onChange={event => console.log(rowNumber, columnNumber, event.target.value)}/>
          )}
-     </div>))} </div> )
+     </div>))} </> )
 }
 
 type InputWithLabelProps = {
@@ -131,5 +131,6 @@ const App = () => {
   );
 }
 
+export default App;
 
 ReactDom.render(<App />, mainElement);
