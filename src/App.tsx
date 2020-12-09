@@ -25,23 +25,32 @@ interface article {
   objectID: number;
 }
 
-const Item: FunctionComponent<article> = ({title, url, author, num_comments, points, objectID}) => (
-  <div>
-    <span>
-      <a href={url}>{title}</a>
-    </span>
-    <span>{author}</span>
-    <span>{num_comments}</span>
-    <span>{points}</span>
-  </div>
-);
+
+type ItemProps = {
+  item: article,
+  onRemoveItem: (item: article) => void,
+};
+
+const Item: FunctionComponent<ItemProps> = ({item,onRemoveItem}: ItemProps) => {
+    const handleRemoveItem = () => {onRemoveItem(item)};
+    const {title, url, author, num_comments, points, objectID} = item;
+    return (<div>
+              <span><a href={url}>{title}</a></span>
+              <span>{author}</span>
+              <span>{num_comments}</span>
+              <span>{points}</span>
+              <span><button type="button" onClick={handleRemoveItem}>Dismiss</button></span>
+            </div>
+        );
+};
 
 type ListProps = {
   list: Array<article>
+  onRemoveItem: (item: article) => void,
 }
 
-const List: FunctionComponent<ListProps>  = ({list}: ListProps) => (<>
-    {list.map((item: article) => (<Item key={item.objectID} {...item} />))}</>);
+const List: FunctionComponent<ListProps>  = ({list, onRemoveItem}: ListProps) => (<>
+    {list.map((item: article) => (<Item key={item.objectID} item={item} onRemoveItem={onRemoveItem}/>))}  </>);
 
 
 type Table1props = {
@@ -73,25 +82,22 @@ type InputWithLabelProps = {
   label?: string,
   type?: string,
   value: string,
+  isFocused: boolean,
   onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
   children?: ReactChild | ReactChildren;
 }
 
-const InputWithLabel = ({id, label, type="text", value, onInputChange, children}: InputWithLabelProps) =>
-  (<>
-    <label htmlFor={id}>{children}</label>
-    <input id={id} type={type} value={value} onChange={onInputChange} />
-  </>);
+const InputWithLabel: FunctionComponent<InputWithLabelProps> =
+  ({id, label, type="text", value, isFocused, onInputChange, children}: InputWithLabelProps) => {
+    const inputRef = React.useRef<HTMLInputElement>(null);
+    React.useEffect(() => {if (isFocused && inputRef.current) {inputRef.current.focus();}}, [isFocused]);
+    return (<>
+        <label htmlFor={id}>{children}</label>&nbsp;
+        <input ref={inputRef} id={id} type={type} value={value} autoFocus={isFocused} onChange={onInputChange} />
+      </>);
+  };
 
-
-const App = () => {
-
-  const contentheader = ["Alabel", "Blabel", "Clabel" ]
-  const content = [
-    ["A1","B1","C1"],
-    ["A2","B2","C2"]
-  ]
-  const stories = [
+  const initialStories = [
     {
       title: 'React',
       url: 'https://reactjs.org/',
@@ -110,11 +116,26 @@ const App = () => {
     },
   ];
 
+const App = () => {
+
+  const contentheader = ["Alabel", "Blabel", "Clabel" ]
+  const content = [
+    ["A1","B1","C1"],
+    ["A2","B2","C2"]
+  ]
+
+
   const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
+  const [stories, setStories] = React.useState(initialStories);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>)  => {
     setSearchTerm(event.target.value);
   };
+
+  const handleRemoveStory = (item: article) => {
+    const newStories = stories.filter(story => item.objectID !== story.objectID);
+    setStories(newStories);
+  }
 
   const searchedStories = stories.filter((story: article) => {
     return story.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -122,10 +143,10 @@ const App = () => {
 
   return (
     <div>
-      <InputWithLabel id="search"  value={searchTerm} onInputChange={handleSearch}>Search: </InputWithLabel>
+      <InputWithLabel id="search"  value={searchTerm} isFocused onInputChange={handleSearch}>Search: </InputWithLabel>
       <p>Searching for <strong>{searchTerm}</strong></p>
       <hr />
-      <List list={searchedStories} />
+      <List list={searchedStories} onRemoveItem={handleRemoveStory}/>
       <Table1 content={content} header={contentheader}/>
     </div>
   );
