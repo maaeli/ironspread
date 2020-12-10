@@ -32,14 +32,13 @@ type ItemProps = {
 };
 
 const Item: FunctionComponent<ItemProps> = ({item,onRemoveItem}: ItemProps) => {
-    const handleRemoveItem = () => {onRemoveItem(item)};
     const {title, url, author, num_comments, points, objectID} = item;
     return (<div>
               <span><a href={url}>{title}</a></span>
               <span>{author}</span>
               <span>{num_comments}</span>
               <span>{points}</span>
-              <span><button type="button" onClick={handleRemoveItem}>Dismiss</button></span>
+              <span><button type="button" onClick={() => onRemoveItem(item)}>Dismiss</button></span>
             </div>
         );
 };
@@ -60,21 +59,21 @@ type Table1props = {
 
 const Table1: FunctionComponent<Table1props> = ({header, content}: Table1props) => {
   const alphabet = ["A", "B", "C", "D", "E", "F", "G"];
-  return (<>
-      <div key="labels"><span key="corner1"></span>
-      {header.map((cell, columnNumber) => (<span key={"label " + columnNumber}>{alphabet[columnNumber]}</span>))}
-      </div>
-      <div key="headers"><span key="corner2"></span>
-      {header.map((cell, columnNumber) => (<span key={"header " + columnNumber}>{cell}</span>))}
-      </div>
+  return (<table>
+      <tr key="labels"><td key="corner1"></td>
+      {header.map((cell, columnNumber) => (<td key={"label " + columnNumber}>{alphabet[columnNumber]}</td>))}
+      </tr>
+      <tr key="headers"><td key="corner2"></td>
+      {header.map((cell, columnNumber) => (<td key={"header " + columnNumber}>{cell}</td>))}
+      </tr>
       {content.map((row, rowNumber) => (
-      <div key={"row" + rowNumber}>
+      <tr key={"row" + rowNumber}><td></td>
         {row.map((cell, columnNumber) =>
-              <input type="text" value={cell} key={rowNumber + "," + columnNumber}
+              <td><input type="text" value={cell} key={rowNumber + "," + columnNumber}
                      name="name"
-                     onChange={event => console.log(rowNumber, columnNumber, event.target.value)}/>
+                     onChange={event => console.log(rowNumber, columnNumber, event.target.value)}/></td>
          )}
-     </div>))} </> )
+     </tr>))} </table> )
 }
 
 type InputWithLabelProps = {
