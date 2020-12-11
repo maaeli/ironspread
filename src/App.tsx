@@ -26,6 +26,7 @@ interface article {
 }
 
 
+
 type ItemProps = {
   item: article,
   onRemoveItem: (item: article) => void,
@@ -44,7 +45,7 @@ const Item: FunctionComponent<ItemProps> = ({item,onRemoveItem}: ItemProps) => {
 };
 
 type ListProps = {
-  list: Array<article>
+  list: Array<article>,
   onRemoveItem: (item: article) => void,
 }
 
@@ -59,21 +60,23 @@ type Table1props = {
 
 const Table1: FunctionComponent<Table1props> = ({header, content}: Table1props) => {
   const alphabet = ["A", "B", "C", "D", "E", "F", "G"];
-  return (<table>
+  return (<table key="table">
+      <thead key="head">
       <tr key="labels"><td key="corner1"></td>
       {header.map((cell, columnNumber) => (<td key={"label " + columnNumber}>{alphabet[columnNumber]}</td>))}
       </tr>
       <tr key="headers"><td key="corner2"></td>
       {header.map((cell, columnNumber) => (<td key={"header " + columnNumber}>{cell}</td>))}
       </tr>
+      </thead>
+      <tbody key="body">
       {content.map((row, rowNumber) => (
-      <tr key={"row" + rowNumber}><td></td>
+      <tr key={"row" + rowNumber}><td>{rowNumber}</td>
         {row.map((cell, columnNumber) =>
-              <td><input type="text" value={cell} key={rowNumber + "," + columnNumber}
+              <td key={"cell " + rowNumber + "," + columnNumber}><input type="text" value={cell} key={rowNumber + "," + columnNumber}
                      name="name"
-                     onChange={event => console.log(rowNumber, columnNumber, event.target.value)}/></td>
-         )}
-     </tr>))} </table> )
+                     onChange={event => console.log(rowNumber, columnNumber, event.target.value)}/></td>)}
+     </tr>))} </tbody></table> )
 }
 
 type InputWithLabelProps = {
@@ -96,7 +99,7 @@ const InputWithLabel: FunctionComponent<InputWithLabelProps> =
       </>);
   };
 
-  const initialStories = [
+  const initialStories: article[] = [
     {
       title: 'React',
       url: 'https://reactjs.org/',
@@ -113,7 +116,18 @@ const InputWithLabel: FunctionComponent<InputWithLabelProps> =
       points: 5,
       objectID: 1,
     },
-  ];
+];
+
+type StoryList = {
+  stories: Array<article>,
+};
+
+
+type StoryPromise = {
+  data: StoryList,
+};
+
+const getAsyncStories = () => new Promise<StoryPromise>(resolve => resolve({data: {stories: initialStories}}));
 
 const App = () => {
 
@@ -125,14 +139,17 @@ const App = () => {
 
 
   const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
-  const [stories, setStories] = React.useState(initialStories);
+  const [stories, setStories] = React.useState([] as article[]);
+  React.useEffect(() => {getAsyncStories().then((result: StoryPromise) => {
+      setStories(result.data.stories);
+    });}, []);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>)  => {
     setSearchTerm(event.target.value);
   };
 
   const handleRemoveStory = (item: article) => {
-    const newStories = stories.filter(story => item.objectID !== story.objectID);
+    const newStories = stories.filter((story: article) => item.objectID !== story.objectID);
     setStories(newStories);
   }
 
