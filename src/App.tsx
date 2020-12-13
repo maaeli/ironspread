@@ -15,6 +15,19 @@ const useSemiPersistentState = (key: string, initialState: any) => {
   return [value, setValue];
 };
 
+type Action =
+ | {type: 'SET_STORIES', payload: Array<article>}
+ | {type: 'REMOVE_STORIES', payload: article}
+
+
+const storiesReducer = (state: Array<article>, action: Action) => {
+  if (action.type === 'SET_STORIES')
+    return action.payload;
+  else if (action.type === 'REMOVE_STORIES')
+    return state.filter(story => action.payload.objectID !== story.objectID);
+  else throw new Error();
+}
+
 
 interface article {
   title: string;
@@ -127,7 +140,8 @@ type StoryPromise = {
   data: StoryList,
 };
 
-const getAsyncStories = () => new Promise<StoryPromise>(resolve => resolve({data: {stories: initialStories}}));
+const getAsyncStories = () => new Promise<StoryPromise>(resolve =>
+  setTimeout(() => resolve({data: {stories: initialStories}}), 20000));
 
 const App = () => {
 
@@ -139,18 +153,30 @@ const App = () => {
 
 
   const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
-  const [stories, setStories] = React.useState([] as article[]);
-  React.useEffect(() => {getAsyncStories().then((result: StoryPromise) => {
-      setStories(result.data.stories);
-    });}, []);
+  const [stories, dispatchStories] = React.useReducer(storiesReducer, [] as article[]);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isError, setIsError] = React.useState(false);
+
+
+
+  React.useEffect(() => {
+      setIsLoading(true);
+      getAsyncStories().then((result: StoryPromise) => {
+        dispatchStories({
+          type: 'SET_STORIES',
+          payload: result.data.stories});
+        setIsLoading(false);
+      })
+      .catch(() => setIsError(true));}, []);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>)  => {
     setSearchTerm(event.target.value);
   };
 
   const handleRemoveStory = (item: article) => {
-    const newStories = stories.filter((story: article) => item.objectID !== story.objectID);
-    setStories(newStories);
+    dispatchStories({
+      type: 'REMOVE_STORIES',
+      payload: item});
   }
 
   const searchedStories = stories.filter((story: article) => {
@@ -162,8 +188,10 @@ const App = () => {
       <InputWithLabel id="search"  value={searchTerm} isFocused onInputChange={handleSearch}>Search: </InputWithLabel>
       <p>Searching for <strong>{searchTerm}</strong></p>
       <hr />
-      <List list={searchedStories} onRemoveItem={handleRemoveStory}/>
-      <Table1 content={content} header={contentheader}/>
+      {isError && <p>Something went wrong ... </p>}
+      {isLoading ? (<p>Loading ...</p>) :
+      (<><List list={searchedStories} onRemoveItem={handleRemoveStory} />
+          <Table1 content={content} header={contentheader} /></>)}
     </div>
   );
 }
