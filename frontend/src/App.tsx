@@ -6,10 +6,13 @@ document.body.appendChild(mainElement);
 
 const DEMO_API_ENDPOINT = 'http://hn.algolia.com/api/v1/search?query=';
 
-const useSemiPersistentState = <S extends unknown>(key: string, initialState: S) => {
+const useSemiPersistentState = <S extends unknown>(
+  key: string,
+  initialState: S,
+) => {
   const [value, setValue] = React.useState(
-    localStorage.getItem(key) || initialState
-  );
+  localStorage.getItem(key) || initialState
+);
 
   React.useEffect(() => {localStorage.setItem(key, value as string);}, [value, key]);
 
@@ -199,8 +202,9 @@ const App = () => {
   const handleRemoveStory = (item: article) => {
     dispatchStories({
       type: 'REMOVE_STORIES',
-      payload: item});
-  }
+      payload: item,
+    });
+  };
 
   const searchedStories = stories.stories.filter((story: article) => {
     return story.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -208,16 +212,30 @@ const App = () => {
 
   return (
     <div>
-      <InputWithLabel id="search"  value={searchTerm} isFocused onInputChange={handleSearch}>Search: </InputWithLabel>
-      <p>Searching for <strong>{searchTerm}</strong></p>
+      <InputWithLabel
+        id="search"
+        value={searchTerm}
+        isFocused
+        onInputChange={handleSearch}
+      >
+        Search:
+      </InputWithLabel>
+      <p>
+        Searching for <strong>{searchTerm}</strong>
+      </p>
       <hr />
       {stories.isError && <p>Something went wrong ... </p>}
-      {stories.isLoading ? (<p>Loading ...</p>) :
-      (<><List list={searchedStories} onRemoveItem={handleRemoveStory} />
-          <Table1 content={content} header={contentheader} /></>)}
+      {stories.isLoading ? (
+        <p>Loading ...</p>
+      ) : (
+        <>
+          <List list={searchedStories} onRemoveItem={handleRemoveStory} />
+          <Table1 content={content} header={contentheader} />
+        </>
+      )}
     </div>
   );
-}
+};
 
 export default App;
 
