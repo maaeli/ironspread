@@ -1,31 +1,53 @@
-import React,  { FunctionComponent, ReactChild, ReactChildren } from 'react';
+import React, { FunctionComponent, ReactChild, ReactChildren } from 'react';
 import ReactDom from 'react-dom';
-import Button from '@material-ui/core/Button';
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
 
-const useSemiPersistentState = (key: string, initialState: any) => {
+const DEMO_API_ENDPOINT = 'http://hn.algolia.com/api/v1/search?query=';
+
+const useSemiPersistentState = <S extends unknown>(key: string, initialState: S) => {
   const [value, setValue] = React.useState(
     localStorage.getItem(key) || initialState
   );
 
-  React.useEffect(() => {localStorage.setItem(key, value);}, [value, key]);
+  React.useEffect(() => {localStorage.setItem(key, value as string);}, [value, key]);
 
   return [value, setValue];
 };
 
 type Action =
- | {type: 'SET_STORIES', payload: Array<article>}
+ | {type: 'STORIES_FETCH_INIT'}
+ | {type: 'STORIES_FETCH_SUCCESS', payload: Array<article>}
+ | {type: 'STORIES_FETCH_FAILURE'}
  | {type: 'REMOVE_STORIES', payload: article}
 
+type StoriesState = {
+  stories: Array<article>,
+  isLoading: boolean,
+  isError: boolean,
+};
 
-const storiesReducer = (state: Array<article>, action: Action) => {
-  if (action.type === 'SET_STORIES')
-    return action.payload;
-  else if (action.type === 'REMOVE_STORIES')
-    return state.filter(story => action.payload.objectID !== story.objectID);
-  else throw new Error();
+const storiesReducer = (state: StoriesState, action: Action) => {
+  switch (action.type) {
+    case 'STORIES_FETCH_INIT':
+      return {...state,
+              isLoading: true,
+              isError: false,}
+    case 'STORIES_FETCH_SUCCESS':
+      return {...state,
+              stories: action.payload,
+              isLoading: false,
+              isError: false,};
+    case 'STORIES_FETCH_FAILURE':
+      return {...state,
+              isLoading: false,
+              isError: true,}
+    case 'REMOVE_STORIES':
+      return {...state,
+              stories: state.stories.filter(story => action.payload.objectID !== story.objectID),};
+    default: throw new Error();
+  }
 }
 
 
@@ -72,7 +94,7 @@ type Table1props = {
 }
 
 const Table1: FunctionComponent<Table1props> = ({header, content}: Table1props) => {
-  const alphabet = ["A", "B", "C", "D", "E", "F", "G"];
+  const alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"];
   return (<table key="table">
       <thead key="head">
       <tr key="labels"><td key="corner1"></td>
@@ -140,8 +162,9 @@ type StoryPromise = {
   data: StoryList,
 };
 
-const getAsyncStories = () => new Promise<StoryPromise>(resolve =>
+const getAsyncStories = () => new Promise<StoryPromise>((resolve) =>
   setTimeout(() => resolve({data: {stories: initialStories}}), 20000));
+  //setTimeout(reject, 20000));
 
 const App = () => {
 
@@ -153,21 +176,21 @@ const App = () => {
 
 
   const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
-  const [stories, dispatchStories] = React.useReducer(storiesReducer, [] as article[]);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [isError, setIsError] = React.useState(false);
-
-
+  const [stories, dispatchStories] = React.useReducer(storiesReducer, {
+    stories: [] as article[],
+    isLoading: false,
+    isError: false});
 
   React.useEffect(() => {
-      setIsLoading(true);
-      getAsyncStories().then((result: StoryPromise) => {
+    dispatchStories({type: 'STORIES_FETCH_INIT'});
+    fetch(`${DEMO_API_ENDPOINT}react`)
+      .then((response) =>  response.json())
+      .then(result => {
         dispatchStories({
-          type: 'SET_STORIES',
-          payload: result.data.stories});
-        setIsLoading(false);
-      })
-      .catch(() => setIsError(true));}, []);
+          type: 'STORIES_FETCH_SUCCESS',
+          payload: result.hits});
+        })
+      .catch(() => dispatchStories({type: 'STORIES_FETCH_FAILURE'}));}, []);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>)  => {
     setSearchTerm(event.target.value);
@@ -179,7 +202,7 @@ const App = () => {
       payload: item});
   }
 
-  const searchedStories = stories.filter((story: article) => {
+  const searchedStories = stories.stories.filter((story: article) => {
     return story.title.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
@@ -188,8 +211,8 @@ const App = () => {
       <InputWithLabel id="search"  value={searchTerm} isFocused onInputChange={handleSearch}>Search: </InputWithLabel>
       <p>Searching for <strong>{searchTerm}</strong></p>
       <hr />
-      {isError && <p>Something went wrong ... </p>}
-      {isLoading ? (<p>Loading ...</p>) :
+      {stories.isError && <p>Something went wrong ... </p>}
+      {stories.isLoading ? (<p>Loading ...</p>) :
       (<><List list={searchedStories} onRemoveItem={handleRemoveStory} />
           <Table1 content={content} header={contentheader} /></>)}
     </div>
