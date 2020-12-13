@@ -193,9 +193,10 @@ const App = () => {
           type: 'STORIES_FETCH_SUCCESS',
           payload: result.hits});
         })
-      .catch(() => dispatchStories({type: 'STORIES_FETCH_FAILURE'}));}, []);
+      .catch(() => dispatchStories({type: 'STORIES_FETCH_FAILURE' }));
+    }, []);
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>)  => {
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
