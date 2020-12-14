@@ -222,6 +222,8 @@ const content = [
   ['A2', 'B2', 'C2'],
 ];
 
+/* eslint-disable max-lines-per-function */
+
 const App = (): JSX.Element => {
   const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
   const [stories, dispatchStories] = React.useReducer(storiesReducer, {
@@ -278,12 +280,14 @@ const App = (): JSX.Element => {
       ) : (
         <>
           <List list={searchedStories} onRemoveItem={handleRemoveStory} />
-          <Table1 content={content} header={contentheader} />
         </>
       )}
+      <Table1 content={content} header={contentheader} />
     </div>
   );
 };
+
+/* eslint-enable max-lines-per-function */
 
 export default App;
 
