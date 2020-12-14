@@ -1,4 +1,10 @@
-import React, { FunctionComponent, ReactChild, ReactChildren, Dispatch, SetStateAction } from 'react';
+import React, {
+  FunctionComponent,
+  ReactChild,
+  ReactChildren,
+  Dispatch,
+  SetStateAction,
+} from 'react';
 import ReactDom from 'react-dom';
 
 const mainElement = document.createElement('div');
@@ -24,36 +30,42 @@ type Action =
   | { type: 'STORIES_FETCH_INIT' }
   | { type: 'STORIES_FETCH_SUCCESS'; payload: Array<article> }
   | { type: 'STORIES_FETCH_FAILURE' }
-  | { type: 'REMOVE_STORIES', payload: article }
+  | { type: 'REMOVE_STORIES'; payload: article };
 
 type StoriesState = {
-  stories: Array<article>,
-  isLoading: boolean,
-  isError: boolean,
+  stories: Array<article>;
+  isLoading: boolean;
+  isError: boolean;
 };
 
 const storiesReducer = (state: StoriesState, action: Action) => {
   switch (action.type) {
     case 'STORIES_FETCH_INIT':
-      return {...state,
-              isLoading: true,
-              isError: false,}
+      return { ...state, isLoading: true, isError: false };
     case 'STORIES_FETCH_SUCCESS':
-      return {...state,
-              stories: action.payload,
-              isLoading: false,
-              isError: false,};
+      return {
+        ...state,
+        stories: action.payload,
+        isLoading: false,
+        isError: false,
+      };
     case 'STORIES_FETCH_FAILURE':
-      return {...state,
-              isLoading: false,
-              isError: true,}
+      return {
+        ...state,
+        isLoading: false,
+        isError: true,
+      };
     case 'REMOVE_STORIES':
-      return {...state,
-              stories: state.stories.filter(story => action.payload.objectID !== story.objectID),};
-    default: throw new Error();
+      return {
+        ...state,
+        stories: state.stories.filter(
+          (story) => action.payload.objectID !== story.objectID,
+        ),
+      };
+    default:
+      throw new Error();
   }
-}
-
+};
 
 interface article {
   title: string;
@@ -64,28 +76,30 @@ interface article {
   objectID: number;
 }
 
-
-
 type ItemProps = {
-  item: article,
-  onRemoveItem: (item: article) => void,
+  item: article;
+  onRemoveItem: (item: article) => void;
 };
 
-const Item: FunctionComponent<ItemProps> = ({item,onRemoveItem}: ItemProps) => {
-    const {title, url, author, num_comments, points, objectID} = item;
-    return (<div>
-              <span><a href={url}>{title}</a></span>
-              <span>{author}</span>
-              <span>{num_comments}</span>
-              <span>{points}</span>
-              <span><button type="button" onClick={() => onRemoveItem(item)}>Dismiss</button></span>
-            </div>
-        );
+const Item: FunctionComponent<ItemProps> = ({
+  item,
+  onRemoveItem,
+}: ItemProps) => {
+  const { title, url, author, num_comments, points, objectID } = item;
+  return (
+    <div>
+      <span><a href={url}>{title}</a></span>
+      <span>{author}</span>
+      <span>{num_comments}</span>
+      <span>{points}</span>
+      <span><button type="button" onClick={() => onRemoveItem(item)}>Dismiss</button></span>
+    </div>
+  );
 };
 
 type ListProps = {
-  list: Array<article>,
-  onRemoveItem: (item: article) => void,
+  list: Array<article>;
+  onRemoveItem: (item: article) => void;
 }
 
 const List: FunctionComponent<ListProps>  = ({list, onRemoveItem}: ListProps) => (<>
