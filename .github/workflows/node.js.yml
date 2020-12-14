@@ -17,11 +17,11 @@ jobs:
     strategy:
       matrix:
         node-version: [10.x, 12.x, 14.x]
-    
+
     defaults:
       run:
         working-directory: ./frontend
-        
+
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
@@ -30,5 +30,3 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm run check-types
-    - run: npm run build --if-present
-    - run: npm test

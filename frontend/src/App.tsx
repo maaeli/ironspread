@@ -1,4 +1,4 @@
-import React, { FunctionComponent, ReactChild, ReactChildren } from 'react';
+import React, { FunctionComponent, ReactChild, ReactChildren, Dispatch, SetStateAction } from 'react';
 import ReactDom from 'react-dom';
 
 const mainElement = document.createElement('div');
@@ -6,24 +6,25 @@ document.body.appendChild(mainElement);
 
 const DEMO_API_ENDPOINT = 'http://hn.algolia.com/api/v1/search?query=';
 
-const useSemiPersistentState = <S extends unknown>(
+const useSemiPersistentState = (
   key: string,
-  initialState: S,
-) => {
+  initialState: string,
+): [string, Dispatch<SetStateAction<string>>] => {
   const [value, setValue] = React.useState(
-  localStorage.getItem(key) || initialState
-);
+    localStorage.getItem(key) || initialState,
+  );
 
-  React.useEffect(() => {localStorage.setItem(key, value as string);}, [value, key]);
-
-  return [value, setValue];
+  React.useEffect(() => {
+    localStorage.setItem(key, value as string);
+  }, [value, key]);
+  return [value as string, setValue as Dispatch<SetStateAction<string>>];
 };
 
 type Action =
- | {type: 'STORIES_FETCH_INIT'}
- | {type: 'STORIES_FETCH_SUCCESS', payload: Array<article>}
- | {type: 'STORIES_FETCH_FAILURE'}
- | {type: 'REMOVE_STORIES', payload: article}
+  | { type: 'STORIES_FETCH_INIT' }
+  | { type: 'STORIES_FETCH_SUCCESS'; payload: Array<article> }
+  | { type: 'STORIES_FETCH_FAILURE' }
+  | { type: 'REMOVE_STORIES', payload: article }
 
 type StoriesState = {
   stories: Array<article>,
@@ -182,19 +183,21 @@ const App = () => {
   const [stories, dispatchStories] = React.useReducer(storiesReducer, {
     stories: [] as article[],
     isLoading: false,
-    isError: false});
+    isError: false,
+  });
 
   React.useEffect(() => {
-    dispatchStories({type: 'STORIES_FETCH_INIT'});
-    fetch(`${DEMO_API_ENDPOINT}react`)
+     dispatchStories({type: 'STORIES_FETCH_INIT' });
+     fetch(`${DEMO_API_ENDPOINT}react`)
       .then((response) =>  response.json())
-      .then(result => {
+      .then((result) => {
         dispatchStories({
           type: 'STORIES_FETCH_SUCCESS',
-          payload: result.hits});
-        })
+          payload: result.hits,
+        });
+      })
       .catch(() => dispatchStories({type: 'STORIES_FETCH_FAILURE' }));
-    }, []);
+  }, []);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -215,7 +218,7 @@ const App = () => {
     <div>
       <InputWithLabel
         id="search"
-        value={searchTerm}
+        value={searchTerm as string}
         isFocused
         onInputChange={handleSearch}
       >
