@@ -34,7 +34,6 @@ jobs:
       run: |
         cd ./frontend
         npm ci
-        npm run-script build
     - name: Get python dependencies
       run: pip install -r requirements_dev.txt
     - name:
