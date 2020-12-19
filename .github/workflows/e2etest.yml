@@ -14,46 +14,30 @@ env:
 #    working-directory: ./backend
 
 jobs:
-  build_backend:
+  build:
     defaults:
       run:
-        working-directory: ./backend
+        working-directory: .
 
     runs-on: ubuntu-latest
+
+    node-version: 12.x
 
     steps:
     - uses: actions/checkout@v2
-    - name: Build
-      run: cargo build
-
-  build_frontend:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [10.x, 12.x, 14.x]
-
-    defaults:
-      run:
-        working-directory: ./frontend
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - run: npm run check-types
-    - run: npm run lint
-
-  build_success:
-    defaults:
-      run:
-        working-directory: ./test
-
-    runs-on: ubuntu-latest
-    needs: [build_backend, build_frontend]
-    steps:
-    - run: pip install -r requirements_dev.txt
-    - run: python run_tests.py
+    - uses: actions/setup-node@v1
+    - name: Build backend
+      run: |
+        cd ./backend
+        cargo build
+    - name: Build frontend
+      run: |
+        cd ./frontend
+        npm ci
+        npm run-script build
+    - name: Get python dependencies
+      run: pip install -r requirements_dev.txt
+    - name:
+      run: |
+        cd test
+        python run_tests.py
