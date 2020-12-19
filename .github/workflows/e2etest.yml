@@ -50,10 +50,10 @@ jobs:
   build_success:
     defaults:
       run:
-        working-directory: .
+        working-directory: ./test
 
     runs-on: ubuntu-latest
     needs: [build_backend, build_frontend]
     steps:
     - run: pip install -r requirements_dev.txt
-    - run: python test/run_tests.py
+    - run: python run_tests.py
