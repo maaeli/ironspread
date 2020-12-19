@@ -1,41 +1,28 @@
 use std::sync::Mutex;
-use serde::{Serialize, Deserialize};
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
-
-struct AppState {
-    app_name: String,
-}
+use serde::{Serialize};
+use actix_web::{get, web, App, HttpServer, Responder};
 
 struct AppStateWithCounter {
     counter: Mutex<i32>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 struct Balance {
     date: String,
     balances: Vec<f32>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 struct AccountNames {
     names: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 struct AccountData {
     account_names: AccountNames,
     balances: Vec<Balance>,
 }
 
-#[get("/")]
-async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello World")
-}
-
-#[post("/echo")]
-async fn echo(req_body: String) -> impl Responder {
-    HttpResponse::Ok().body(req_body)
-}
 
 #[get("/account_data")]
 async fn account_data() -> impl Responder {
@@ -47,10 +34,6 @@ async fn account_data() -> impl Responder {
     let serialized = serde_json::to_string(&current_balance).unwrap();
     println!("serialized = {}", serialized);
     web::Json(current_balance)
-}
-
-async fn manual_hello() -> impl Responder {
-    HttpResponse::Ok().body("Hey there!")
 }
 
 async fn index(data: web::Data<AppStateWithCounter>) -> String {
@@ -70,10 +53,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(counter.clone())
-            .service(hello)
-            .service(echo)
             .service(account_data)
-            .route("/hey", web::get().to(manual_hello))
             .route("/index", web::get().to(index))
     })
     .bind("127.0.0.1:8081")?
