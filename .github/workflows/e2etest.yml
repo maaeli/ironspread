@@ -26,26 +26,26 @@ jobs:
     - name: Build
       run: cargo build
 
-    build_frontend:
-      runs-on: ubuntu-latest
+  build_frontend:
+    runs-on: ubuntu-latest
 
-      strategy:
-        matrix:
-          node-version: [10.x, 12.x, 14.x]
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x, 14.x]
 
-      defaults:
-        run:
-          working-directory: ./frontend
+    defaults:
+      run:
+        working-directory: ./frontend
 
-      steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - run: npm ci
-      - run: npm run check-types
-      - run: npm run lint
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm ci
+    - run: npm run check-types
+    - run: npm run lint
 
   build_success:
     defaults:
