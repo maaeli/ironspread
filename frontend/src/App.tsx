@@ -6,6 +6,7 @@ import React, {
   SetStateAction,
 } from 'react';
 import ReactDom from 'react-dom';
+import axios from 'axios';
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
@@ -232,8 +233,14 @@ const App = (): JSX.Element => {
     isError: false,
   });
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const [url, setUrl] = React.useState(`${DEMO_API_ENDPOINT}${searchTerm}`);
+
+  const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
+  };
+
+  const handleSearchSubmit = () => {
+    setUrl(`${DEMO_API_ENDPOINT}${searchTerm}`);
   };
 
   const handleRemoveStory = (item: article) => {
@@ -243,19 +250,24 @@ const App = (): JSX.Element => {
     });
   };
 
-  React.useEffect(() => {
+  const handleFetchStories = React.useCallback(() => {
     if (!searchTerm) return;
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
-    fetch(`${DEMO_API_ENDPOINT}${searchTerm}`)
-      .then((response) => response.json())
+    axios
+      .get(url)
+      //.then((response) => response.json())
       .then((result) => {
         dispatchStories({
           type: 'STORIES_FETCH_SUCCESS',
-          payload: result.hits,
+          payload: result.data.hits,
         });
       })
       .catch(() => dispatchStories({ type: 'STORIES_FETCH_FAILURE' }));
-  }, [searchTerm]);
+  }, [url]);
+
+  React.useEffect(() => {
+    handleFetchStories();
+  }, [url]);
 
   return (
     <div>
@@ -263,10 +275,13 @@ const App = (): JSX.Element => {
         id="search"
         value={searchTerm as string}
         isFocused
-        onInputChange={handleSearch}
+        onInputChange={handleSearchInput}
       >
         Search:
       </InputWithLabel>
+      <button type="button" disabled={!searchTerm} onClick={handleSearchSubmit}>
+        Submit
+      </button>
       <p>
         Searching for <strong>{searchTerm}</strong>
       </p>
