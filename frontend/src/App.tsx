@@ -2,6 +2,7 @@ import React, {
   FunctionComponent,
   ReactChild,
   ReactChildren,
+  ReactElement,
   Dispatch,
   SetStateAction,
 } from 'react';
@@ -39,7 +40,7 @@ type StoriesState = {
   isError: boolean;
 };
 
-const storiesReducer = (state: StoriesState, action: Action) => {
+const storiesReducer = (state: StoriesState, action: Action): StoriesState => {
   switch (action.type) {
     case 'STORIES_FETCH_INIT':
       return { ...state, isLoading: true, isError: false };
@@ -85,7 +86,7 @@ type ItemProps = {
 const Item: FunctionComponent<ItemProps> = ({
   item,
   onRemoveItem,
-}: ItemProps) => {
+}: ItemProps): ReactElement => {
   const { title, url, author, num_comments, points } = item;
   return (
     <div>
@@ -112,7 +113,7 @@ type ListProps = {
 const List: FunctionComponent<ListProps> = ({
   list,
   onRemoveItem,
-}: ListProps) => (
+}: ListProps): ReactElement => (
   <>
     {list.map((item: article) => (
       <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
@@ -131,7 +132,9 @@ type TableHeaderProps = {
   header: Array<string>;
 };
 
-const TableHeader = ({ header }: TableHeaderProps) => (
+const TableHeader: FunctionComponent<TableHeaderProps> = ({
+  header,
+}: TableHeaderProps): ReactElement => (
   <thead key="head">
     <tr key="labels">
       <td key="corner1"></td>
@@ -151,7 +154,7 @@ const TableHeader = ({ header }: TableHeaderProps) => (
 const Table1: FunctionComponent<Table1props> = ({
   header,
   content,
-}: Table1props) => (
+}: Table1props): ReactElement => (
   <table key="table">
     <TableHeader header={header} />
     <tbody key="body">
@@ -195,7 +198,7 @@ const InputWithLabel: FunctionComponent<InputWithLabelProps> = ({
   isFocused,
   onInputChange,
   children,
-}: InputWithLabelProps) => {
+}: InputWithLabelProps): ReactElement => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {
     if (isFocused && inputRef.current) {
