@@ -8,7 +8,7 @@ if (module.hot) {
   module.hot.accept();
 }
 
-function createWindow() {
+function createWindow(): void {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,

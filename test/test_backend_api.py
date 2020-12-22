@@ -44,7 +44,7 @@ class TestBackEndApi(unittest.TestCase):
         """
         account_data = requests.get("http://localhost:8081/account_data")
         account_data_json = account_data.json()
-        assert account_data_json["account_names"]["names"] == [
+        assert account_data_json["account_names"] == [
             "bank a",
             "bank b",
             "bank c",
@@ -62,7 +62,7 @@ class TestBackEndApi(unittest.TestCase):
 def suite():
     """Assemble tests to suite"""
     test_suite = unittest.TestSuite()
-    test_suite.addTest(TestBackEndApi("test_get_account_data"))
+    test_suite.addTest(TestBackEndApi("test_should_get_test_account_data"))
     return test_suite
 
 

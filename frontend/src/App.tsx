@@ -97,7 +97,7 @@ const Item: FunctionComponent<ItemProps> = ({
       <span>{num_comments}</span>
       <span>{points}</span>
       <span>
-        <button type="button" onClick={() => onRemoveItem(item)}>
+        <button type="button" onClick={(): void => onRemoveItem(item)}>
           Dismiss
         </button>
       </span>
@@ -113,7 +113,7 @@ type ListProps = {
 const List: FunctionComponent<ListProps> = ({
   list,
   onRemoveItem,
-}: ListProps): ReactElement => (
+}: ListProps): ReactElement | null => (
   <>
     {list.map((item: article) => (
       <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
@@ -220,6 +220,37 @@ const InputWithLabel: FunctionComponent<InputWithLabelProps> = ({
   );
 };
 
+type SearchFormProps = {
+  searchTerm: string;
+  onSearchInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onSearchSubmit: (event: React.FormEvent) => void;
+};
+
+const SearchForm: FunctionComponent<SearchFormProps> = ({
+  searchTerm,
+  onSearchInput,
+  onSearchSubmit,
+}: SearchFormProps): ReactElement => (
+  <>
+    <form onSubmit={onSearchSubmit}>
+      <InputWithLabel
+        id="search"
+        value={searchTerm as string}
+        isFocused
+        onInputChange={onSearchInput}
+      >
+        Search:
+      </InputWithLabel>
+      <button type="submit" disabled={!searchTerm}>
+        Submit
+      </button>
+    </form>
+    <p>
+      Searching for <strong>{searchTerm}</strong>
+    </p>
+  </>
+);
+
 const contentheader = ['Alabel', 'Blabel', 'Clabel'];
 const content = [
   ['A1', 'B1', 'C1'],
@@ -242,8 +273,9 @@ const App = (): JSX.Element => {
     setSearchTerm(event.target.value);
   };
 
-  const handleSearchSubmit = () => {
+  const handleSearchSubmit = (event: React.FormEvent) => {
     setUrl(`${DEMO_API_ENDPOINT}${searchTerm}`);
+    event.preventDefault();
   };
 
   const handleRemoveStory = (item: article) => {
@@ -274,20 +306,11 @@ const App = (): JSX.Element => {
 
   return (
     <div>
-      <InputWithLabel
-        id="search"
-        value={searchTerm as string}
-        isFocused
-        onInputChange={handleSearchInput}
-      >
-        Search:
-      </InputWithLabel>
-      <button type="button" disabled={!searchTerm} onClick={handleSearchSubmit}>
-        Submit
-      </button>
-      <p>
-        Searching for <strong>{searchTerm}</strong>
-      </p>
+      <SearchForm
+        searchTerm={searchTerm}
+        onSearchInput={handleSearchInput}
+        onSearchSubmit={handleSearchSubmit}
+      />
       <hr />
       {stories.isError && <p>Something went wrong ... </p>}
       {stories.isLoading ? (
