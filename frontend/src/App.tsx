@@ -9,6 +9,8 @@ import React, {
 import ReactDom from 'react-dom';
 import axios from 'axios';
 
+import './App.css';
+
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
 
@@ -89,15 +91,19 @@ const Item: FunctionComponent<ItemProps> = ({
 }: ItemProps): ReactElement => {
   const { title, url, author, num_comments, points } = item;
   return (
-    <div>
-      <span>
+    <div className="item">
+      <span style={{ width: '40%' }}>
         <a href={url}>{title}</a>
       </span>
-      <span>{author}</span>
-      <span>{num_comments}</span>
-      <span>{points}</span>
-      <span>
-        <button type="button" onClick={(): void => onRemoveItem(item)}>
+      <span style={{ width: '30%' }}>{author}</span>
+      <span style={{ width: '10%' }}>{num_comments}</span>
+      <span style={{ width: '10%' }}>{points}</span>
+      <span style={{ width: '10%' }}>
+        <button
+          type="button"
+          onClick={(): void => onRemoveItem(item)}
+          className="button button_small"
+        >
           Dismiss
         </button>
       </span>
@@ -207,7 +213,10 @@ const InputWithLabel: FunctionComponent<InputWithLabelProps> = ({
   }, [isFocused]);
   return (
     <>
-      <label htmlFor={id}>{children}</label>&nbsp;
+      <label htmlFor={id} className="label">
+        {children}
+      </label>
+      &nbsp;
       <input
         ref={inputRef}
         id={id}
@@ -215,6 +224,7 @@ const InputWithLabel: FunctionComponent<InputWithLabelProps> = ({
         value={value}
         autoFocus={isFocused}
         onChange={onInputChange}
+        className="input"
       />
     </>
   );
@@ -232,7 +242,7 @@ const SearchForm: FunctionComponent<SearchFormProps> = ({
   onSearchSubmit,
 }: SearchFormProps): ReactElement => (
   <>
-    <form onSubmit={onSearchSubmit}>
+    <form onSubmit={onSearchSubmit} className="search-form">
       <InputWithLabel
         id="search"
         value={searchTerm as string}
@@ -241,7 +251,11 @@ const SearchForm: FunctionComponent<SearchFormProps> = ({
       >
         Search:
       </InputWithLabel>
-      <button type="submit" disabled={!searchTerm}>
+      <button
+        type="submit"
+        disabled={!searchTerm}
+        className="button button_large"
+      >
         Submit
       </button>
     </form>
@@ -307,13 +321,13 @@ const App = (): JSX.Element => {
   }, [url]);
 
   return (
-    <div>
+    <div className="container">
+      <h1 className="headline-primary">My story</h1>
       <SearchForm
         searchTerm={searchTerm}
         onSearchInput={handleSearchInput}
         onSearchSubmit={handleSearchSubmit}
       />
-      <hr />
       {stories.isError && <p>Something went wrong ... </p>}
       {stories.isLoading ? (
         <p>Loading ...</p>
