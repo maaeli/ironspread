@@ -168,7 +168,7 @@ const Table1: FunctionComponent<Table1props> = ({
                 value={cell}
                 key={rowNumber + ',' + columnNumber}
                 name="name"
-                onChange={(event) =>
+                onChange={(event: React.ChangeEvent<HTMLInputElement>): void =>
                   console.log(rowNumber, columnNumber, event.target.value)
                 }
               />
@@ -269,16 +269,18 @@ const App = (): JSX.Element => {
 
   const [url, setUrl] = React.useState(`${DEMO_API_ENDPOINT}${searchTerm}`);
 
-  const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchInput = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ): void => {
     setSearchTerm(event.target.value);
   };
 
-  const handleSearchSubmit = (event: React.FormEvent) => {
+  const handleSearchSubmit = (event: React.FormEvent): void => {
     setUrl(`${DEMO_API_ENDPOINT}${searchTerm}`);
     event.preventDefault();
   };
 
-  const handleRemoveStory = (item: article) => {
+  const handleRemoveStory = (item: article): void => {
     dispatchStories({
       type: 'REMOVE_STORIES',
       payload: item,
