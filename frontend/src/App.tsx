@@ -10,6 +10,7 @@ import ReactDom from 'react-dom';
 import axios from 'axios';
 
 import './App.css';
+import { ReactComponent as Check } from './check.svg';
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
@@ -104,7 +105,7 @@ const Item: FunctionComponent<ItemProps> = ({
           onClick={(): void => onRemoveItem(item)}
           className="button button_small"
         >
-          Dismiss
+          <Check height="18px" width="18px"/>
         </button>
       </span>
     </div>
