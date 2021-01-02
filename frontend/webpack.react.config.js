@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { HotModuleReplacementPlugin } = require('webpack');
 
 module.exports = {
   resolve: {
@@ -42,6 +43,7 @@ module.exports = {
     publicPath: './',
   },
   plugins: [
+    new HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin(),
   ],
 };

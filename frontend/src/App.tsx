@@ -345,5 +345,6 @@ const App = (): JSX.Element => {
 /* eslint-enable max-lines-per-function */
 
 export default App;
+export {storiesReducer, StoriesState, Action, SearchForm, InputWithLabel, List, Item}
 
 ReactDom.render(<App />, mainElement);
