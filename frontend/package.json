@@ -81,7 +81,7 @@
   },
   "jest": {
     "roots": [
-      "src/app/react"
+      "src/"
     ],
     "preset": "ts-jest",
     "moduleNameMapper": {
@@ -89,9 +89,7 @@
       "\\.(css)$": "identity-obj-proxy"
     },
     "transform": {
-      "^.+\\.tsx?$": "ts-jest",
-      "^.+\\.(js|jsx)$": "babel-jest",
-      ".+\\.(scss)$": "./node_modules/jest-css-modules-transform"
+      "^.+\\.tsx?$": "ts-jest"
     },
     "moduleFileExtensions": [
       "js",
