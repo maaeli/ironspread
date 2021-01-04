@@ -105,7 +105,7 @@ const Item: FunctionComponent<ItemProps> = ({
           onClick={(): void => onRemoveItem(item)}
           className="button button_small"
         >
-          <Check height="18px" width="18px"/>
+          <Check height="18px" width="18px" />
         </button>
       </span>
     </div>
@@ -345,6 +345,14 @@ const App = (): JSX.Element => {
 /* eslint-enable max-lines-per-function */
 
 export default App;
-export {storiesReducer, StoriesState, Action, SearchForm, InputWithLabel, List, Item}
+export {
+  storiesReducer,
+  StoriesState,
+  Action,
+  SearchForm,
+  InputWithLabel,
+  List,
+  Item,
+};
 
 ReactDom.render(<App />, mainElement);

@@ -33,10 +33,14 @@ const stories = [storyOne, storyTwo];
 
 describe('storiesReducer', () => {
   test('removes a story from all stories', () => {
-    const action: Action = {type: 'REMOVE_STORIES', payload: storyOne};
-    const state = {stories: stories, isLoading: false, isError: false};
+    const action: Action = { type: 'REMOVE_STORIES', payload: storyOne };
+    const state = { stories: stories, isLoading: false, isError: false };
     const newState = storiesReducer(state, action);
-    const expectedState = {stories: [storyTwo], isLoading: false, isError: false}
+    const expectedState = {
+      stories: [storyTwo],
+      isLoading: false,
+      isError: false,
+    };
     expect(newState).toStrictEqual(expectedState);
   });
 });
@@ -48,4 +52,4 @@ describe('something truthy and falsy', () => {
   test('false to be false', () => {
     expect(false).toBe(false);
   });
-})
+});
