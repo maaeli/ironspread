@@ -37,7 +37,7 @@ describe('storiesReducer', () => {
     const state = {stories: stories, isLoading: false, isError: false};
     const newState = storiesReducer(state, action);
     const expectedState = {stories: [storyTwo], isLoading: false, isError: false}
-    expect(newState).toBe(expectedState);
+    expect(newState).toStrictEqual(expectedState);
   });
 });
 
