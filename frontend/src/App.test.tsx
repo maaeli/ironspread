@@ -1,17 +1,8 @@
-import React from 'react';
-import ReactDom from 'react-dom';
-import { render, screen } from '@testing-library/react';
-import App, {
-  storiesReducer,
-  StoriesState,
-  Action,
-  Item,
-  List,
-  SearchForm,
-  InputWithLabel,
-} from './App';
+import '@testing-library/jest-dom';
+import { storiesReducer, Action } from './App';
+import { article } from './Item';
 
-const storyOne = {
+const storyOne: article = {
   title: 'React',
   url: 'https://reactjs.org/',
   author: 'Jordan Walke',
@@ -20,7 +11,7 @@ const storyOne = {
   objectID: 0,
 };
 
-const storyTwo = {
+const storyTwo: article = {
   title: 'Redux',
   url: 'https://redux.js.org/',
   author: 'Dan Abramov, Andrew Clark',
@@ -42,14 +33,5 @@ describe('storiesReducer', () => {
       isError: false,
     };
     expect(newState).toStrictEqual(expectedState);
-  });
-});
-
-describe('something truthy and falsy', () => {
-  test('true to be true', () => {
-    expect(true).toBe(true);
-  });
-  test('false to be false', () => {
-    expect(false).toBe(false);
   });
 });

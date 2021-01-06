@@ -8,9 +8,8 @@ import React, {
 } from 'react';
 import ReactDom from 'react-dom';
 import axios from 'axios';
-
+import Item, { article } from './Item';
 import './App.css';
-import { ReactComponent as Check } from './check.svg';
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
@@ -70,46 +69,6 @@ const storiesReducer = (state: StoriesState, action: Action): StoriesState => {
     default:
       throw new Error();
   }
-};
-
-interface article {
-  title: string;
-  url: string;
-  author: string;
-  num_comments: number;
-  points: number;
-  objectID: number;
-}
-
-type ItemProps = {
-  item: article;
-  onRemoveItem: (item: article) => void;
-};
-
-const Item: FunctionComponent<ItemProps> = ({
-  item,
-  onRemoveItem,
-}: ItemProps): ReactElement => {
-  const { title, url, author, num_comments, points } = item;
-  return (
-    <div className="item">
-      <span style={{ width: '40%' }}>
-        <a href={url}>{title}</a>
-      </span>
-      <span style={{ width: '30%' }}>{author}</span>
-      <span style={{ width: '10%' }}>{num_comments}</span>
-      <span style={{ width: '10%' }}>{points}</span>
-      <span style={{ width: '10%' }}>
-        <button
-          type="button"
-          onClick={(): void => onRemoveItem(item)}
-          className="button button_small"
-        >
-          <Check height="18px" width="18px" />
-        </button>
-      </span>
-    </div>
-  );
 };
 
 type ListProps = {
@@ -352,7 +311,6 @@ export {
   SearchForm,
   InputWithLabel,
   List,
-  Item,
 };
 
 ReactDom.render(<App />, mainElement);
