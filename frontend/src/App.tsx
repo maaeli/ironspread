@@ -6,13 +6,9 @@ import React, {
   Dispatch,
   SetStateAction,
 } from 'react';
-import ReactDom from 'react-dom';
 import axios from 'axios';
 import Item, { article } from './Item';
 import './App.css';
-
-const mainElement = document.createElement('div');
-document.body.appendChild(mainElement);
 
 const DEMO_API_ENDPOINT = 'http://hn.algolia.com/api/v1/search?query=';
 
@@ -312,5 +308,3 @@ export {
   InputWithLabel,
   List,
 };
-
-ReactDom.render(<App />, mainElement);
