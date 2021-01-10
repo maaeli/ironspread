@@ -12,10 +12,11 @@ struct Balance {
     balances: Vec<f32>,
 }
 
-#[derive(Serialize, Debug)]
-struct AccountNames {
-    names: Vec<String>,
-}
+//#[derive(Serialize, Debug)]
+//struct AccountNames {
+//    names: Vec<String>,
+//}
+type AccountNames = Vec<String>;
 
 #[derive(Serialize, Debug)]
 struct AccountData {
@@ -26,7 +27,7 @@ struct AccountData {
 
 #[get("/account_data")]
 async fn account_data() -> impl Responder {
-    let account_names = AccountNames{names: vec![String::from("bank a"), String::from("bank b"), String::from("bank c")]};
+    let account_names = vec![String::from("bank a"), String::from("bank b"), String::from("bank c")];
     let balance1 = Balance {date: String::from("May 2018"), balances: vec![1.3, 5.6, 7.8]};
     let balance2 = Balance {date: String::from("June 2018"), balances: vec![-0.3, 2.1, 4.0]};
 

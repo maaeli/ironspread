@@ -23,11 +23,7 @@ class TestBackEndApi(unittest.TestCase):
     def setUp(self):
         """Start the web server"""
         server_application_path = PurePath(
-            this_file_as_path.parent.parent,
-            "backend",
-            "target",
-            "debug",
-            "ironspread",
+            this_file_as_path.parent.parent, "backend", "target", "debug", "ironspread"
         )
         self.server_instance = Popen(server_application_path)
 
@@ -35,13 +31,20 @@ class TestBackEndApi(unittest.TestCase):
         """Stop the web server after the test"""
         self.server_instance.kill()
 
-    def test_get_account_data(self):  # pylint: disable=R0201
-        """ Test output of accounts data API. """
-        account_data = requests.get(
-            "http://localhost:8081/account_data"
-        )
+    def test_should_get_test_account_data(self):  # pylint: disable=R0201
+        """
+        A GET on account_data should provide the following json:
+            {"account_names":
+                {"names":["bank a","bank b","bank c"]},
+            "balances":[
+            {"date":"May 2018","balances":[1.3,5.6,7.8]},
+            {"date":"June 2018","balances":[-0.3,2.1,4.0]}
+            ]
+            }
+        """
+        account_data = requests.get("http://localhost:8081/account_data")
         account_data_json = account_data.json()
-        assert account_data_json["account_names"]["names"] == [
+        assert account_data_json["account_names"] == [
             "bank a",
             "bank b",
             "bank c",
@@ -59,7 +62,7 @@ class TestBackEndApi(unittest.TestCase):
 def suite():
     """Assemble tests to suite"""
     test_suite = unittest.TestSuite()
-    test_suite.addTest(TestBackEndApi("test_get_account_data"))
+    test_suite.addTest(TestBackEndApi("test_should_get_test_account_data"))
     return test_suite
 
 

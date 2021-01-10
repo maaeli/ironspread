@@ -1,12 +1,13 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { HotModuleReplacementPlugin } = require('webpack');
 
 module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     mainFields: ['main', 'module', 'browser'],
   },
-  entry: './src/app.tsx',
+  entry: './src/index.tsx',
   target: 'electron-renderer',
   devtool: 'source-map',
   module: {
@@ -18,6 +19,14 @@ module.exports = {
           loader: 'babel-loader',
         },
       },
+      {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"],
+      },
+      {
+       test: /\.svg$/,
+       use: ['@svgr/webpack', 'url-loader'],
+     },
     ],
   },
   devServer: {
@@ -34,6 +43,7 @@ module.exports = {
     publicPath: './',
   },
   plugins: [
+    new HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin(),
   ],
 };

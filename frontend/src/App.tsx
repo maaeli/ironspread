@@ -2,13 +2,13 @@ import React, {
   FunctionComponent,
   ReactChild,
   ReactChildren,
+  ReactElement,
   Dispatch,
   SetStateAction,
 } from 'react';
-import ReactDom from 'react-dom';
-
-const mainElement = document.createElement('div');
-document.body.appendChild(mainElement);
+import axios from 'axios';
+import Item, { article } from './Item';
+import './App.css';
 
 const DEMO_API_ENDPOINT = 'http://hn.algolia.com/api/v1/search?query=';
 
@@ -38,7 +38,7 @@ type StoriesState = {
   isError: boolean;
 };
 
-const storiesReducer = (state: StoriesState, action: Action) => {
+const storiesReducer = (state: StoriesState, action: Action): StoriesState => {
   switch (action.type) {
     case 'STORIES_FETCH_INIT':
       return { ...state, isLoading: true, isError: false };
@@ -67,42 +67,6 @@ const storiesReducer = (state: StoriesState, action: Action) => {
   }
 };
 
-interface article {
-  title: string;
-  url: string;
-  author: string;
-  num_comments: number;
-  points: number;
-  objectID: number;
-}
-
-type ItemProps = {
-  item: article;
-  onRemoveItem: (item: article) => void;
-};
-
-const Item: FunctionComponent<ItemProps> = ({
-  item,
-  onRemoveItem,
-}: ItemProps) => {
-  const { title, url, author, num_comments, points } = item;
-  return (
-    <div>
-      <span>
-        <a href={url}>{title}</a>
-      </span>
-      <span>{author}</span>
-      <span>{num_comments}</span>
-      <span>{points}</span>
-      <span>
-        <button type="button" onClick={() => onRemoveItem(item)}>
-          Dismiss
-        </button>
-      </span>
-    </div>
-  );
-};
-
 type ListProps = {
   list: Array<article>;
   onRemoveItem: (item: article) => void;
@@ -111,7 +75,7 @@ type ListProps = {
 const List: FunctionComponent<ListProps> = ({
   list,
   onRemoveItem,
-}: ListProps) => (
+}: ListProps): ReactElement | null => (
   <>
     {list.map((item: article) => (
       <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
@@ -130,7 +94,9 @@ type TableHeaderProps = {
   header: Array<string>;
 };
 
-const TableHeader = ({ header }: TableHeaderProps) => (
+const TableHeader: FunctionComponent<TableHeaderProps> = ({
+  header,
+}: TableHeaderProps): ReactElement => (
   <thead key="head">
     <tr key="labels">
       <td key="corner1"></td>
@@ -150,7 +116,7 @@ const TableHeader = ({ header }: TableHeaderProps) => (
 const Table1: FunctionComponent<Table1props> = ({
   header,
   content,
-}: Table1props) => (
+}: Table1props): ReactElement => (
   <table key="table">
     <TableHeader header={header} />
     <tbody key="body">
@@ -164,7 +130,7 @@ const Table1: FunctionComponent<Table1props> = ({
                 value={cell}
                 key={rowNumber + ',' + columnNumber}
                 name="name"
-                onChange={(event) =>
+                onChange={(event: React.ChangeEvent<HTMLInputElement>): void =>
                   console.log(rowNumber, columnNumber, event.target.value)
                 }
               />
@@ -194,7 +160,7 @@ const InputWithLabel: FunctionComponent<InputWithLabelProps> = ({
   isFocused,
   onInputChange,
   children,
-}: InputWithLabelProps) => {
+}: InputWithLabelProps): ReactElement => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {
     if (isFocused && inputRef.current) {
@@ -203,7 +169,10 @@ const InputWithLabel: FunctionComponent<InputWithLabelProps> = ({
   }, [isFocused]);
   return (
     <>
-      <label htmlFor={id}>{children}</label>&nbsp;
+      <label htmlFor={id} className="label">
+        {children}
+      </label>
+      &nbsp;
       <input
         ref={inputRef}
         id={id}
@@ -211,10 +180,46 @@ const InputWithLabel: FunctionComponent<InputWithLabelProps> = ({
         value={value}
         autoFocus={isFocused}
         onChange={onInputChange}
+        className="input"
       />
     </>
   );
 };
+
+type SearchFormProps = {
+  searchTerm: string;
+  onSearchInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onSearchSubmit: (event: React.FormEvent) => void;
+};
+
+const SearchForm: FunctionComponent<SearchFormProps> = ({
+  searchTerm,
+  onSearchInput,
+  onSearchSubmit,
+}: SearchFormProps): ReactElement => (
+  <>
+    <form onSubmit={onSearchSubmit} className="search-form">
+      <InputWithLabel
+        id="search"
+        value={searchTerm as string}
+        isFocused
+        onInputChange={onSearchInput}
+      >
+        Search:
+      </InputWithLabel>
+      <button
+        type="submit"
+        disabled={!searchTerm}
+        className="button button_large"
+      >
+        Submit
+      </button>
+    </form>
+    <p>
+      Searching for <strong>{searchTerm}</strong>
+    </p>
+  </>
+);
 
 const contentheader = ['Alabel', 'Blabel', 'Clabel'];
 const content = [
@@ -232,54 +237,59 @@ const App = (): JSX.Element => {
     isError: false,
   });
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const [url, setUrl] = React.useState(`${DEMO_API_ENDPOINT}${searchTerm}`);
+
+  const handleSearchInput = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ): void => {
     setSearchTerm(event.target.value);
   };
 
-  const handleRemoveStory = (item: article) => {
+  const handleSearchSubmit = (event: React.FormEvent): void => {
+    setUrl(`${DEMO_API_ENDPOINT}${searchTerm}`);
+    event.preventDefault();
+  };
+
+  const handleRemoveStory = (item: article): void => {
     dispatchStories({
       type: 'REMOVE_STORIES',
       payload: item,
     });
   };
 
-  React.useEffect(() => {
+  const handleFetchStories = React.useCallback(() => {
+    if (!searchTerm) return;
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
-    fetch(`${DEMO_API_ENDPOINT}react`)
-      .then((response) => response.json())
+    axios
+      .get(url)
+      //.then((response) => response.json())
       .then((result) => {
         dispatchStories({
           type: 'STORIES_FETCH_SUCCESS',
-          payload: result.hits,
+          payload: result.data.hits,
         });
       })
       .catch(() => dispatchStories({ type: 'STORIES_FETCH_FAILURE' }));
-  }, []);
+  }, [url]);
 
-  const searchedStories = stories.stories.filter((story: article) => {
-    return story.title.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  React.useEffect(() => {
+    handleFetchStories();
+  }, [url]);
 
   return (
-    <div>
-      <InputWithLabel
-        id="search"
-        value={searchTerm as string}
-        isFocused
-        onInputChange={handleSearch}
-      >
-        Search:
-      </InputWithLabel>
-      <p>
-        Searching for <strong>{searchTerm}</strong>
-      </p>
-      <hr />
+    <div className="container">
+      <h1 className="headline-primary">My story</h1>
+      <SearchForm
+        searchTerm={searchTerm}
+        onSearchInput={handleSearchInput}
+        onSearchSubmit={handleSearchSubmit}
+      />
       {stories.isError && <p>Something went wrong ... </p>}
       {stories.isLoading ? (
         <p>Loading ...</p>
       ) : (
         <>
-          <List list={searchedStories} onRemoveItem={handleRemoveStory} />
+          <List list={stories.stories} onRemoveItem={handleRemoveStory} />
         </>
       )}
       <Table1 content={content} header={contentheader} />
@@ -290,5 +300,11 @@ const App = (): JSX.Element => {
 /* eslint-enable max-lines-per-function */
 
 export default App;
-
-ReactDom.render(<App />, mainElement);
+export {
+  storiesReducer,
+  StoriesState,
+  Action,
+  SearchForm,
+  InputWithLabel,
+  List,
+};
