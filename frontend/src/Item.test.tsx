@@ -1,6 +1,6 @@
 /*eslint "@typescript-eslint/no-empty-function": ["error", { "allow": ["arrowFunctions"] }] */
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import Item, { article } from './Item';
 
 const storyOne: article = {
@@ -18,7 +18,17 @@ describe('Item', () => {
     expect(screen.getByText('Jordan Walke')).toBeInTheDocument();
     expect(screen.getByText('React')).toHaveAttribute(
       'href',
-      'https://reactjs.org/'
+      'https://reactjs.org/',
     );
+  });
+  test('renders a clickable dismiss button', () => {
+    render(<Item item={storyOne} onRemoveItem={(): void => {}} />);
+    expect(screen.getByRole('button')).toBeInTheDocument();
+  });
+  test('clicking the dismiss button calls the callback hanlder', () => {
+    const handleRemoveItem = jest.fn();
+    render(<Item item={storyOne} onRemoveItem={handleRemoveItem} />);
+    fireEvent.click(screen.getByRole('button'));
+    expect(handleRemoveItem).toHaveBeenCalledTimes(1);
   });
 });
