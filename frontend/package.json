@@ -99,6 +99,7 @@
       "js",
       "ts",
       "tsx"
-    ]
+    ],
+    "setupFilesAfterEnv": ["<rootDir>/setupTests.ts"]
   }
 }

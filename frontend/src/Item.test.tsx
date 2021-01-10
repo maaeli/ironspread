@@ -1,6 +1,5 @@
 /*eslint "@typescript-eslint/no-empty-function": ["error", { "allow": ["arrowFunctions"] }] */
 import React from 'react';
-import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import Item, { article } from './Item';
 
@@ -17,9 +16,9 @@ describe('Item', () => {
   test('renders all properties', () => {
     render(<Item item={storyOne} onRemoveItem={(): void => {}} />);
     expect(screen.getByText('Jordan Walke')).toBeInTheDocument();
-    //expect(screen.getByText('React')).toHaveAttribute(
-    //  'href',
-    //  'https://reactjs.org/'
-    //);
+    expect(screen.getByText('React')).toHaveAttribute(
+      'href',
+      'https://reactjs.org/'
+    );
   });
 });
