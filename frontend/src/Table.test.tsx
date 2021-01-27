@@ -11,6 +11,14 @@ const content = [
 describe('Table', () => {
   test('render all properties', () => {
     render(<Table content={content} header={contentheader} />);
-    screen.debug();
+    expect(screen.getByText('Alabel')).toBeInTheDocument();
+    expect(screen.getByText('Blabel')).toBeInTheDocument();
+    expect(screen.getByText('Clabel')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('A1')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('B1')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('C1')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('A2')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('B2')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('C2')).toBeInTheDocument();
   });
 });
