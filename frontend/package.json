@@ -30,6 +30,7 @@
   },
   "scripts": {
     "test": "jest",
+    "fix-lint": "eslint --fix --ext .ts --ext tsx .",
     "lint": "eslint --ext .ts --ext tsx .",
     "check-types": "tsc",
     "dev:electron": "NODE_ENV=development webpack --config webpack.electron.config.js --mode development && electron .",
