@@ -1,6 +1,12 @@
 import '@testing-library/jest-dom';
-import { storiesReducer, Action } from './App';
+import React from 'react';
+import axios from 'axios';
+import { render, screen } from '@testing-library/react';
+import { act } from 'react-dom/test-utils';
+import App, { storiesReducer, Action } from './App';
 import { article } from './Item';
+
+jest.mock('axios');
 
 const storyOne: article = {
   title: 'React',
@@ -33,5 +39,23 @@ describe('storiesReducer', () => {
       isError: false,
     };
     expect(newState).toStrictEqual(expectedState);
+  });
+});
+
+describe('App', () => {
+  test('succeeds fetching data', async () => {
+    const promise = Promise.resolve({
+      data: {
+        hits: stories,
+      },
+    });
+    const get = axios.get as jest.Mock;
+    get.mockImplementationOnce(() => promise);
+
+    render(<App />);
+    screen.debug();
+
+    await act(() => promise.then());
+    screen.debug();
   });
 });
