@@ -2,19 +2,20 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import axios from 'axios';
-import {  queryByText, render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 //import { act } from 'react-dom/test-utils';
-import {renderHook, act} from '@testing-library/react-hooks'
-import userEvent from '@testing-library/user-event'
+import { act } from '@testing-library/react-hooks';
 import App, { storiesReducer, Action } from './App';
 import { article } from './Item';
 
 jest.mock('axios');
 
+const reactAuthor = 'Jordan Walke';
+
 const storyOne: article = {
   title: 'React',
   url: 'https://reactjs.org/',
-  author: 'Jordan Walke',
+  author: reactAuthor,
   num_comments: 3,
   points: 4,
   objectID: 0,
@@ -58,7 +59,9 @@ describe('App', () => {
     render(<App />);
     expect(screen.queryByText(/Loading/)).toBeInTheDocument();
 
-    await act((): void => {promise});
+    await act((): void => {
+      promise;
+    });
     expect(screen.queryByText(/Loading/)).toBeNull;
 
     expect(screen.getByText('React')).toBeInTheDocument();
@@ -68,9 +71,11 @@ describe('App', () => {
 
   test('fails fetching data', async () => {
     const get = axios.get as jest.Mock;
-    const rejectedAxiosMock = get.mockRejectedValueOnce(new Error('Async error'));
+    const rejectedAxiosMock = get.mockRejectedValueOnce(
+      new Error('Async error'),
+    );
 
-    const app =render(<App />);
+    render(<App />);
     expect(screen.queryByText(/Loading/)).toBeInTheDocument();
 
     await act(async () => rejectedAxiosMock());
@@ -83,17 +88,17 @@ describe('App', () => {
     const resolvedAxiosMock = get.mockResolvedValue({
       data: {
         hits: stories,
-      }
+      },
     });
 
     render(<App />);
 
     await act(async () => resolvedAxiosMock());
-    expect(screen.getByText('Jordan Walke')).toBeInTheDocument();
+    expect(screen.getByText(reactAuthor)).toBeInTheDocument();
     expect(screen.getAllByRole('button').length).toBe(3);
 
     fireEvent.click(screen.getAllByRole('button')[1]);
-    expect(screen.queryByText('Jordan Walke')).toBeNull();
+    expect(screen.queryByText(reactAuthor)).toBeNull();
     expect(screen.getAllByRole('button').length).toBe(2);
   });
 
