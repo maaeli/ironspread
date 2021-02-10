@@ -92,7 +92,7 @@ const content = [
 /* eslint-disable max-lines-per-function */
 
 const App = (): JSX.Element => {
-  const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
+  const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'react');
   const [stories, dispatchStories] = React.useReducer(storiesReducer, {
     stories: [] as article[],
     isLoading: false,
@@ -124,7 +124,6 @@ const App = (): JSX.Element => {
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
     axios
       .get(url)
-      //.then((response) => response.json())
       .then((result) => {
         dispatchStories({
           type: 'STORIES_FETCH_SUCCESS',
