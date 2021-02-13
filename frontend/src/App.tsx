@@ -9,6 +9,7 @@ import Item, { article } from './Item';
 import SearchForm from './SearchForm';
 import Table from './Table';
 import './App.css';
+import { parse_account_json_to_table } from './data';
 
 const DEMO_API_ENDPOINT = 'http://hn.algolia.com/api/v1/search?query=';
 
@@ -26,7 +27,7 @@ const useSemiPersistentState = (
   return [value as string, setValue as Dispatch<SetStateAction<string>>];
 };
 
-type Action =
+type StoriesAction =
   | { type: 'STORIES_FETCH_INIT' }
   | { type: 'STORIES_FETCH_SUCCESS'; payload: Array<article> }
   | { type: 'STORIES_FETCH_FAILURE' }
@@ -38,7 +39,7 @@ type StoriesState = {
   isError: boolean;
 };
 
-const storiesReducer = (state: StoriesState, action: Action): StoriesState => {
+const storiesReducer = (state: StoriesState, action: StoriesAction): StoriesState => {
   switch (action.type) {
     case 'STORIES_FETCH_INIT':
       return { ...state, isLoading: true, isError: false };
@@ -66,6 +67,29 @@ const storiesReducer = (state: StoriesState, action: Action): StoriesState => {
       throw new Error();
   }
 };
+
+type AccountDataAction =
+  | { type: 'ACCOUNT_DATA_FETCH_INIT' }
+  | { type: 'ACCOUNT_DATA_FETCH_SUCCESS'; payload: Array<article> }
+
+
+type AccountDataState = {
+  isLoading: boolean;
+  isError: boolean;
+};
+
+const accountDataReducer = (state: AccountDataState, action: AccountDataAction): AccountDataState => {
+  switch (action.type) {
+    case 'ACCOUNT_DATA_FETCH_INIT':
+      return { ...state, isLoading: true, isError: false };
+    case 'ACCOUNT_DATA_FETCH_SUCCESS':
+      console.log(action.payload);
+      return { ...state, isLoading: false, isError: false };
+    default:
+      throw new Error();
+  }
+};
+
 
 type ListProps = {
   list: Array<article>;
@@ -96,6 +120,11 @@ const App = (): JSX.Element => {
   const [stories, dispatchStories] = React.useReducer(storiesReducer, {
     stories: [] as article[],
     isLoading: false,
+    isError: false,
+  });
+
+  const [account_data, dispatch_account_data] = React.useReducer(accountDataReducer, {
+    isLoading: true,
     isError: false,
   });
 
@@ -131,12 +160,29 @@ const App = (): JSX.Element => {
         });
       })
       .catch(() => dispatchStories({ type: 'STORIES_FETCH_FAILURE' }));
-  }, [url]);
+  }, [url as String]);
+
+  const handleFetchAccountData = React.useCallback(() => {
+    dispatch_account_data({ type: 'ACCOUNT_DATA_FETCH_INIT' });
+    axios
+      .get(url)
+      .then((result) => {
+        dispatch_account_data({
+          type: 'ACCOUNT_DATA_FETCH_SUCCESS',
+          payload: result.data,
+        });
+      })
+      .catch(() => {console.log("account fetch failed")});
+  }, []);
 
   React.useEffect(() => {
     handleFetchStories();
-  }, [url]);
+  }, [url as String]);
 
+  React.useEffect(() => {
+    handleFetchAccountData();
+  }, [url as String]);
+ 
   return (
     <div className="container">
       <h1 className="headline-primary">My story</h1>
@@ -153,7 +199,13 @@ const App = (): JSX.Element => {
           <List list={stories.stories} onRemoveItem={handleRemoveStory} />
         </>
       )}
-      <Table content={content} header={contentheader} />
+      {account_data.isLoading ? (
+        <p>Waiting for data ...</p>
+      ): ( 
+      <> 
+        <Table content={content} header={contentheader} />
+      </>
+      )}
     </div>
   );
 };
@@ -161,4 +213,4 @@ const App = (): JSX.Element => {
 /* eslint-enable max-lines-per-function */
 
 export default App;
-export { storiesReducer, StoriesState, Action, List };
+export { storiesReducer, StoriesState, StoriesAction, List };

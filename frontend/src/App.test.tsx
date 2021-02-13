@@ -2,11 +2,11 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import axios from 'axios';
-import { render, screen, fireEvent } from '@testing-library/react';
-//import { act } from 'react-dom/test-utils';
-import { act } from '@testing-library/react-hooks';
-import App, { storiesReducer, Action } from './App';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { act } from 'react-dom/test-utils';
+import App, { storiesReducer, StoriesAction } from './App';
 import { article } from './Item';
+
 
 jest.mock('axios');
 
@@ -34,7 +34,7 @@ const stories = [storyOne, storyTwo];
 
 describe('storiesReducer', () => {
   test('removes a story from all stories', () => {
-    const action: Action = { type: 'REMOVE_STORIES', payload: storyOne };
+    const action: StoriesAction = { type: 'REMOVE_STORIES', payload: storyOne };
     const state = { stories: stories, isLoading: false, isError: false };
     const newState = storiesReducer(state, action);
     const expectedState = {
@@ -46,6 +46,7 @@ describe('storiesReducer', () => {
   });
 });
 
+
 describe('App', () => {
   test('succeeds fetching data', async () => {
     const promise = Promise.resolve({
@@ -53,17 +54,35 @@ describe('App', () => {
         hits: stories,
       },
     });
-    const get = axios.get as jest.Mock;
-    get.mockImplementationOnce(() => promise);
+
+    const tablePromise = 
+    Promise.resolve({
+      data: {
+        account_names: { names: ['alpha', 'beta'],
+        balances: [
+          { date: 'May 2018', balances: ['A0', 'B0']},
+          { date: 'June 2018', balances:  ['A1', 'B1']},
+        ],
+      },
+    }});
+
+    const axiosMock = (axios.get as jest.Mock).mockImplementation((url: String) => {
+      if (url) {
+      if (url.includes('react')) {
+        return promise;
+      }
+      if (url.includes('account_data')) {
+        return tablePromise;
+      }
+    }
+    });
 
     render(<App />);
     expect(screen.queryByText(/Loading/)).toBeInTheDocument();
-
-    await act((): void => {
-      promise;
-    });
+    expect(screen.queryByText(/Waiting for data/)).toBeInTheDocument();
+    await waitFor(() => expect(axiosMock).toHaveBeenCalledTimes(2));
     expect(screen.queryByText(/Loading/)).toBeNull;
-
+    expect(screen.queryByText(/Waiting for data/)).not.toBeInTheDocument();
     expect(screen.getByText('React')).toBeInTheDocument();
     expect(screen.getByText('Redux')).toBeInTheDocument();
     expect(screen.getAllByRole('button').length).toBe(3);
@@ -102,7 +121,7 @@ describe('App', () => {
     expect(screen.getAllByRole('button').length).toBe(2);
   });
 
-  /* I cannot get this one to work, revisit later.
+  /* //I cannot get this one to work, revisit later.
   test('searches for specific stories', async () => {
     const anotherStory = {
       title: 'Javascript',
@@ -131,7 +150,7 @@ describe('App', () => {
       if (url.includes('JavaScript')) {
         return jsPromise;
       }
-      throw Error();
+      //throw Error();
     })
 
 
@@ -152,8 +171,8 @@ describe('App', () => {
     });
     expect(screen.queryByText('react')).toBeNull();
     expect(screen.queryByText('JavaScript')).toBeInTheDocument();
-    await fireEvent.submit(screen.getByText('Submit'));
-    //await act(async () => jsPromise.then());
+    fireEvent.submit(screen.getByText('Submit'));
+    await act(async () => jsPromise.then());
     expect(axios.get).toHaveBeenCalledTimes(2);
     expect(screen.queryByText('Jordan Walke')).toBeNull();
     expect(screen.queryByText('Dan Abramov, Andrew Clark')).toBeNull();
