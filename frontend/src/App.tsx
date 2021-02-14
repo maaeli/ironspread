@@ -165,7 +165,7 @@ const App = (): JSX.Element => {
   const handleFetchAccountData = React.useCallback(() => {
     dispatch_account_data({ type: 'ACCOUNT_DATA_FETCH_INIT' });
     axios
-      .get(url)
+      .get('http://localhost:8081/account_data')
       .then((result) => {
         dispatch_account_data({
           type: 'ACCOUNT_DATA_FETCH_SUCCESS',

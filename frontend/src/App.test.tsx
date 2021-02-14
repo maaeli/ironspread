@@ -2,7 +2,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import axios from 'axios';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor,cleanup } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import App, { storiesReducer, StoriesAction } from './App';
 import { article } from './Item';
@@ -32,6 +32,17 @@ const storyTwo: article = {
 
 const stories = [storyOne, storyTwo];
 
+const tablePromise = 
+Promise.resolve({
+  data: {
+    account_names: { names: ['alpha', 'beta'],
+    balances: [
+      { date: 'May 2018', balances: ['A0', 'B0']},
+      { date: 'June 2018', balances:  ['A1', 'B1']},
+    ],
+  },
+}});
+
 describe('storiesReducer', () => {
   test('removes a story from all stories', () => {
     const action: StoriesAction = { type: 'REMOVE_STORIES', payload: storyOne };
@@ -55,17 +66,6 @@ describe('App', () => {
       },
     });
 
-    const tablePromise = 
-    Promise.resolve({
-      data: {
-        account_names: { names: ['alpha', 'beta'],
-        balances: [
-          { date: 'May 2018', balances: ['A0', 'B0']},
-          { date: 'June 2018', balances:  ['A1', 'B1']},
-        ],
-      },
-    }});
-
     const axiosMock = (axios.get as jest.Mock).mockImplementation((url: String) => {
       if (url) {
       if (url.includes('react')) {
@@ -88,16 +88,23 @@ describe('App', () => {
     expect(screen.getAllByRole('button').length).toBe(3);
   });
 
-  test('fails fetching data', async () => {
+  test('fails fetching stories data', async () => {
     const get = axios.get as jest.Mock;
-    const rejectedAxiosMock = get.mockRejectedValueOnce(
-      new Error('Async error'),
-    );
+    const axiosMock = (axios.get as jest.Mock).mockImplementation((url: String) => {
+      if (url) {
+      if (url.includes('react')) {
+        return Promise.reject(new Error('Async error'));
+      }
+      if (url.includes('account_data')) {
+        return tablePromise;
+      }
+    }
+    });
 
     render(<App />);
     expect(screen.queryByText(/Loading/)).toBeInTheDocument();
 
-    await act(async () => rejectedAxiosMock());
+    await waitFor(() => expect(axiosMock).toHaveBeenCalledTimes(2));
     expect(screen.queryByText(/Loading/)).toBeNull;
     expect(screen.queryByText(/went wrong/)).toBeInTheDocument();
   });
@@ -150,14 +157,16 @@ describe('App', () => {
       if (url.includes('JavaScript')) {
         return jsPromise;
       }
-      //throw Error();
+      if (url.includes('account_data')) {
+        return tablePromise;
+      }
     })
 
 
     render(<App />);
 
     await act(async () => reactPromise.then());
-    expect(axios.get).toHaveBeenCalledTimes(1);
+    expect(axios.get).toHaveBeenCalledTimes(2);
     expect(screen.queryByText('react')).toBeInTheDocument();
     expect(screen.queryByText('JavaScript')).toBeNull();
     expect(screen.queryByText('Jordan Walke')).toBeInTheDocument();
@@ -172,8 +181,8 @@ describe('App', () => {
     expect(screen.queryByText('react')).toBeNull();
     expect(screen.queryByText('JavaScript')).toBeInTheDocument();
     fireEvent.submit(screen.getByText('Submit'));
-    await act(async () => jsPromise.then());
-    expect(axios.get).toHaveBeenCalledTimes(2);
+    //await act(async () => jsPromise.then());
+    await waitFor(() => expect(axiosMock).toHaveBeenCalledTimes(4));
     expect(screen.queryByText('Jordan Walke')).toBeNull();
     expect(screen.queryByText('Dan Abramov, Andrew Clark')).toBeNull();
     expect(screen.queryByText('Brendan Eich')).toBeInTheDocument();
