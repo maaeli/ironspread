@@ -176,7 +176,7 @@ describe('App', () => {
     expect(screen.getAllByRole('button').length).toBe(2);
   });
 
-  /* //I cannot get this one to work, revisit later.
+  //I cannot get this one to work, revisit later.
   test('searches for specific stories', async () => {
     const anotherStory = {
       title: 'Javascript',
@@ -186,41 +186,46 @@ describe('App', () => {
       points: 10,
       objectId: 3,
     }
-  
-    const reactPromise = Promise.resolve({
-      data: {
-        hits: stories,
-      },
-    });
-    const jsPromise = Promise.resolve({
-      data: {
-        hits: anotherStory,
-      },
-    });
-  
+
     const axiosMock = (axios.get as jest.Mock).mockImplementation((url: String) => {
-      if (url.includes('react')) {
-        return reactPromise;
+      if (url) {
+        if (url.includes('react')) {
+          return Promise.resolve({
+            data: {
+              hits: stories,
+            },
+          });;
+        }
+        if (url.includes('account_data')) {
+          return Promise.resolve({
+            data: {
+              account_names: { names: ['al', 'bl'] },
+              balances: [
+                { date: 'one', balances: [4, 1.1] },
+                { date: 'two', balances: [5, 8.9] },
+              ],
+            }
+          });;
+        }
+        if (url.includes('JavaScript')) {
+          return Promise.resolve({
+            data: {
+              hits: [anotherStory],
+            },
+          });;
+        }
       }
-      if (url.includes('JavaScript')) {
-        return jsPromise;
-      }
-      if (url.includes('account_data')) {
-        return tablePromise;
-      }
-    })
-  
-  
+    });
+
     render(<App />);
-  
-    await act(async () => reactPromise.then());
-    expect(axios.get).toHaveBeenCalledTimes(2);
+
+    await waitFor(() => expect(axiosMock).toHaveBeenCalledTimes(2));
     expect(screen.queryByText('react')).toBeInTheDocument();
     expect(screen.queryByText('JavaScript')).toBeNull();
     expect(screen.queryByText('Jordan Walke')).toBeInTheDocument();
     expect(screen.queryByText('Dan Abramov, Andrew Clark')).toBeInTheDocument();
     expect(screen.queryByText('Brendan Eich')).toBeNull();
-  
+
     fireEvent.change(screen.getByDisplayValue('react'), {
       target: {
         value: 'JavaScript',
@@ -230,14 +235,12 @@ describe('App', () => {
     await waitFor(() => expect(screen.queryByText('JavaScript')).toBeInTheDocument());
     fireEvent.submit(screen.getByText('Submit'));
     expect(screen.queryByText('JavaScript')).toBeInTheDocument();
-    //await act(async () => jsPromise.then());
-    //await waitFor(() => expect(axiosMock).toHaveBeenCalledTimes(3));
-    //await waitFor(() => expect(expect(screen.getByText('Brendan Eich')).toBeInTheDocument()));
+    await waitFor(() => expect(axiosMock).toHaveBeenCalledTimes(3));
     await waitFor(() => expect(expect(screen.getByText('Brendan Eich')).toBeInTheDocument()));
     expect(screen.queryByText('Jordan Walke')).toBeNull();
     expect(screen.queryByText('Dan Abramov, Andrew Clark')).toBeNull();
     expect(screen.queryByText('Brendan Eich')).toBeInTheDocument();
-  }); */
+  });
 
   afterEach(() => {
     jest.clearAllMocks();
