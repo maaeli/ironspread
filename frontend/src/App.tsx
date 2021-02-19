@@ -9,7 +9,7 @@ import Item, { article } from './Item';
 import SearchForm from './SearchForm';
 import Table, { TableProps } from './Table';
 import './App.css';
-import { parse_account_json_to_table } from './data';
+import { parse_account_json_to_table, AccountBalancesFromServer } from './data';
 
 const DEMO_API_ENDPOINT = 'http://hn.algolia.com/api/v1/search?query=';
 
@@ -39,7 +39,10 @@ type StoriesState = {
   isError: boolean;
 };
 
-const storiesReducer = (state: StoriesState, action: StoriesAction): StoriesState => {
+const storiesReducer = (
+  state: StoriesState,
+  action: StoriesAction,
+): StoriesState => {
   switch (action.type) {
     case 'STORIES_FETCH_INIT':
       return { ...state, isLoading: true, isError: false };
@@ -70,27 +73,28 @@ const storiesReducer = (state: StoriesState, action: StoriesAction): StoriesStat
 
 type AccountDataAction =
   | { type: 'ACCOUNT_DATA_FETCH_INIT' }
-  | { type: 'ACCOUNT_DATA_FETCH_SUCCESS'; payload: any }
-
+  | { type: 'ACCOUNT_DATA_FETCH_SUCCESS'; payload: AccountBalancesFromServer };
 
 type AccountDataState = {
-  tableData?: TableProps,
+  tableData?: TableProps;
   isLoading: boolean;
   isError: boolean;
 };
 
-const accountDataReducer = (state: AccountDataState, action: AccountDataAction): AccountDataState => {
+const accountDataReducer = (
+  state: AccountDataState,
+  action: AccountDataAction,
+): AccountDataState => {
   switch (action.type) {
     case 'ACCOUNT_DATA_FETCH_INIT':
       return { ...state, isLoading: true, isError: false };
     case 'ACCOUNT_DATA_FETCH_SUCCESS':
-      const { header, content } = parse_account_json_to_table(action.payload);
-      return { ...state, isLoading: false, isError: false };
+      const tableData = parse_account_json_to_table(action.payload);
+      return { ...state, tableData, isLoading: false, isError: false };
     default:
       throw new Error();
   }
 };
-
 
 type ListProps = {
   list: Array<article>;
@@ -124,14 +128,17 @@ const App = (): JSX.Element => {
     isError: false,
   });
 
-  const [account_data, dispatch_account_data] = React.useReducer(accountDataReducer, {
-    isLoading: true,
-    isError: false,
-  });
+  const [account_data, dispatch_account_data] = React.useReducer(
+    accountDataReducer,
+    {
+      isLoading: true,
+      isError: false,
+    },
+  );
 
   const [url, setUrl] = React.useState(`${DEMO_API_ENDPOINT}${searchTerm}`);
 
-  const demo = "";
+  const demo = '';
 
   const handleSearchInput = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -163,7 +170,7 @@ const App = (): JSX.Element => {
         });
       })
       .catch(() => dispatchStories({ type: 'STORIES_FETCH_FAILURE' }));
-  }, [url as String]);
+  }, [url as string]);
 
   const handleFetchAccountData = React.useCallback(() => {
     dispatch_account_data({ type: 'ACCOUNT_DATA_FETCH_INIT' });
@@ -175,12 +182,14 @@ const App = (): JSX.Element => {
           payload: result.data,
         });
       })
-      .catch(() => { });
+      .catch(() => {
+        console.log('Not yet implemented');
+      });
   }, [demo as string]);
 
   React.useEffect(() => {
     handleFetchStories();
-  }, [url as String]);
+  }, [url as string]);
 
   React.useEffect(() => {
     handleFetchAccountData();

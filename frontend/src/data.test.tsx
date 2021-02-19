@@ -21,6 +21,5 @@ describe('parse_account_json_to_table', () => {
       ['-0.3', '2.1', '4.0'],
     ]);
   });
-}
-);
+});
 /* eslint-enable max-lines-per-function */

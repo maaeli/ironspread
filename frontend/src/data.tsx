@@ -5,14 +5,16 @@ type AccountBalances = {
 };
 
 type account_names = {
-  names: Array<string>,
-}
+  names: Array<string>;
+};
 type AccountBalancesFromServer = {
-  account_names: account_names,
-  balances: Array<AccountBalances>
-}
+  account_names: account_names;
+  balances: Array<AccountBalances>;
+};
 
-const parse_account_json_to_table = (input_structure: AccountBalancesFromServer): TableProps => {
+const parse_account_json_to_table = (
+  input_structure: AccountBalancesFromServer,
+): TableProps => {
   const account_names = input_structure.account_names.names;
   const balances = input_structure.balances
     .map((entry: AccountBalances) => entry.balances)
@@ -22,4 +24,4 @@ const parse_account_json_to_table = (input_structure: AccountBalancesFromServer)
   return { header: account_names, content: balances };
 };
 
-export { parse_account_json_to_table };
+export { parse_account_json_to_table, AccountBalancesFromServer };
