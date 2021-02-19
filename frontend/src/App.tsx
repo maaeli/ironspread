@@ -7,7 +7,7 @@ import React, {
 import axios from 'axios';
 import Item, { article } from './Item';
 import SearchForm from './SearchForm';
-import Table from './Table';
+import Table, { TableProps } from './Table';
 import './App.css';
 import { parse_account_json_to_table } from './data';
 
@@ -70,10 +70,11 @@ const storiesReducer = (state: StoriesState, action: StoriesAction): StoriesStat
 
 type AccountDataAction =
   | { type: 'ACCOUNT_DATA_FETCH_INIT' }
-  | { type: 'ACCOUNT_DATA_FETCH_SUCCESS'; payload: Array<article> }
+  | { type: 'ACCOUNT_DATA_FETCH_SUCCESS'; payload: any }
 
 
 type AccountDataState = {
+  tableData?: TableProps,
   isLoading: boolean;
   isError: boolean;
 };
@@ -84,6 +85,10 @@ const accountDataReducer = (state: AccountDataState, action: AccountDataAction):
       return { ...state, isLoading: true, isError: false };
     case 'ACCOUNT_DATA_FETCH_SUCCESS':
       console.log(action.payload);
+      const { header, content } = parse_account_json_to_table(action.payload);
+      console.log(header);
+
+      console.log(content);
       return { ...state, isLoading: false, isError: false };
     default:
       throw new Error();
@@ -130,6 +135,8 @@ const App = (): JSX.Element => {
 
   const [url, setUrl] = React.useState(`${DEMO_API_ENDPOINT}${searchTerm}`);
 
+  const demo = "";
+
   const handleSearchInput = (
     event: React.ChangeEvent<HTMLInputElement>,
   ): void => {
@@ -172,8 +179,8 @@ const App = (): JSX.Element => {
           payload: result.data,
         });
       })
-      .catch(() => {console.log("account fetch failed")});
-  }, []);
+      .catch(() => { console.log("account fetch failed") });
+  }, [demo as string]);
 
   React.useEffect(() => {
     handleFetchStories();
@@ -181,8 +188,8 @@ const App = (): JSX.Element => {
 
   React.useEffect(() => {
     handleFetchAccountData();
-  }, [url as String]);
- 
+  }, [demo as string]);
+
   return (
     <div className="container">
       <h1 className="headline-primary">My story</h1>
@@ -201,10 +208,10 @@ const App = (): JSX.Element => {
       )}
       {account_data.isLoading ? (
         <p>Waiting for data ...</p>
-      ): ( 
-      <> 
-        <Table content={content} header={contentheader} />
-      </>
+      ) : (
+        <>
+          <Table content={content} header={contentheader} />
+        </>
       )}
     </div>
   );

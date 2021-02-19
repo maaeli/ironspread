@@ -2,7 +2,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import axios from 'axios';
-import { render, screen, fireEvent, waitFor,cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import App, { storiesReducer, StoriesAction } from './App';
 import { article } from './Item';
@@ -32,16 +32,18 @@ const storyTwo: article = {
 
 const stories = [storyOne, storyTwo];
 
-const tablePromise = 
-Promise.resolve({
-  data: {
-    account_names: { names: ['alpha', 'beta'],
-    balances: [
-      { date: 'May 2018', balances: ['A0', 'B0']},
-      { date: 'June 2018', balances:  ['A1', 'B1']},
-    ],
-  },
-}});
+const tablePromise =
+  Promise.resolve({
+    data: {
+      account_names: {
+        names: ['alpha', 'beta'],
+        balances: [
+          { date: 'May 2018', balances: ['A0', 'B0'] },
+          { date: 'June 2018', balances: ['A1', 'B1'] },
+        ],
+      },
+    }
+  });
 
 describe('storiesReducer', () => {
   test('removes a story from all stories', () => {
@@ -68,13 +70,13 @@ describe('App', () => {
 
     const axiosMock = (axios.get as jest.Mock).mockImplementation((url: String) => {
       if (url) {
-      if (url.includes('react')) {
-        return promise;
+        if (url.includes('react')) {
+          return promise;
+        }
+        if (url.includes('account_data')) {
+          return tablePromise;
+        }
       }
-      if (url.includes('account_data')) {
-        return tablePromise;
-      }
-    }
     });
 
     render(<App />);
@@ -92,13 +94,13 @@ describe('App', () => {
     const get = axios.get as jest.Mock;
     const axiosMock = (axios.get as jest.Mock).mockImplementation((url: String) => {
       if (url) {
-      if (url.includes('react')) {
-        return Promise.reject(new Error('Async error'));
+        if (url.includes('react')) {
+          return Promise.reject(new Error('Async error'));
+        }
+        if (url.includes('account_data')) {
+          return tablePromise;
+        }
       }
-      if (url.includes('account_data')) {
-        return tablePromise;
-      }
-    }
     });
 
     render(<App />);
@@ -149,7 +151,7 @@ describe('App', () => {
         hits: anotherStory,
       },
     });
-  
+
     const axiosMock = (axios.get as jest.Mock).mockImplementation((url: String) => {
       if (url.includes('react')) {
         return reactPromise;
@@ -173,16 +175,19 @@ describe('App', () => {
     expect(screen.queryByText('Dan Abramov, Andrew Clark')).toBeInTheDocument();
     expect(screen.queryByText('Brendan Eich')).toBeNull();
 
-    fireEvent.change(screen.getByDisplayValue('react'), { 
-     target: {
-       value: 'JavaScript',
+    fireEvent.change(screen.getByDisplayValue('react'), {
+      target: {
+        value: 'JavaScript',
       },
     });
     expect(screen.queryByText('react')).toBeNull();
-    expect(screen.queryByText('JavaScript')).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('JavaScript')).toBeInTheDocument());
     fireEvent.submit(screen.getByText('Submit'));
+    expect(screen.queryByText('JavaScript')).toBeInTheDocument();
     //await act(async () => jsPromise.then());
-    await waitFor(() => expect(axiosMock).toHaveBeenCalledTimes(4));
+    //await waitFor(() => expect(axiosMock).toHaveBeenCalledTimes(3));
+    //await waitFor(() => expect(expect(screen.getByText('Brendan Eich')).toBeInTheDocument()));
+    await waitFor(() => expect(expect(screen.getByText('Brendan Eich')).toBeInTheDocument()));
     expect(screen.queryByText('Jordan Walke')).toBeNull();
     expect(screen.queryByText('Dan Abramov, Andrew Clark')).toBeNull();
     expect(screen.queryByText('Brendan Eich')).toBeInTheDocument();
