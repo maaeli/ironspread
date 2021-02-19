@@ -45,6 +45,12 @@ const tablePromise =
     }
   });
 
+const promise = Promise.resolve({
+  data: {
+    hits: stories,
+  },
+});
+
 describe('storiesReducer', () => {
   test('removes a story from all stories', () => {
     const action: StoriesAction = { type: 'REMOVE_STORIES', payload: storyOne };
@@ -60,21 +66,31 @@ describe('storiesReducer', () => {
 });
 
 
+
+
 describe('App', () => {
   test('succeeds fetching data', async () => {
-    const promise = Promise.resolve({
-      data: {
-        hits: stories,
-      },
-    });
 
     const axiosMock = (axios.get as jest.Mock).mockImplementation((url: String) => {
       if (url) {
         if (url.includes('react')) {
-          return promise;
+          return Promise.resolve({
+            data: {
+              hits: stories,
+            },
+          });;
         }
         if (url.includes('account_data')) {
-          return tablePromise;
+          return Promise.resolve({
+            data: {
+              account_names: { names: ['al', 'bl'] },
+              balances: [
+                { date: 'one', balances: [4, 1.1] },
+                { date: 'two', balances: [5, 8.9] },
+              ],
+            }
+          });;
+
         }
       }
     });
@@ -98,7 +114,15 @@ describe('App', () => {
           return Promise.reject(new Error('Async error'));
         }
         if (url.includes('account_data')) {
-          return tablePromise;
+          return Promise.resolve({
+            data: {
+              account_names: { names: ['al', 'bl'] },
+              balances: [
+                { date: 'one', balances: [4, 1.1] },
+                { date: 'two', balances: [5, 8.9] },
+              ],
+            }
+          });;;
         }
       }
     });
@@ -112,16 +136,38 @@ describe('App', () => {
   });
 
   test('removes a story', async () => {
-    const get = axios.get as jest.Mock;
-    const resolvedAxiosMock = get.mockResolvedValue({
+
+    const axiosMock = (axios.get as jest.Mock).mockImplementation((url: String) => {
+      if (url) {
+        if (url.includes('react')) {
+          return Promise.resolve({
+            data: {
+              hits: stories,
+            },
+          });;
+        }
+        if (url.includes('account_data')) {
+          return Promise.resolve({
+            data: {
+              account_names: { names: ['al', 'bl'] },
+              balances: [
+                { date: 'one', balances: [4, 1.1] },
+                { date: 'two', balances: [5, 8.9] },
+              ],
+            }
+          });;
+
+        }
+      }
+    });
+    const promise = Promise.resolve({
       data: {
         hits: stories,
       },
     });
-
     render(<App />);
 
-    await act(async () => resolvedAxiosMock());
+    await waitFor(() => expect(axiosMock).toHaveBeenCalledTimes(2));
     expect(screen.getByText(reactAuthor)).toBeInTheDocument();
     expect(screen.getAllByRole('button').length).toBe(3);
 
@@ -140,7 +186,7 @@ describe('App', () => {
       points: 10,
       objectId: 3,
     }
-
+  
     const reactPromise = Promise.resolve({
       data: {
         hits: stories,
@@ -151,7 +197,7 @@ describe('App', () => {
         hits: anotherStory,
       },
     });
-
+  
     const axiosMock = (axios.get as jest.Mock).mockImplementation((url: String) => {
       if (url.includes('react')) {
         return reactPromise;
@@ -163,10 +209,10 @@ describe('App', () => {
         return tablePromise;
       }
     })
-
-
+  
+  
     render(<App />);
-
+  
     await act(async () => reactPromise.then());
     expect(axios.get).toHaveBeenCalledTimes(2);
     expect(screen.queryByText('react')).toBeInTheDocument();
@@ -174,7 +220,7 @@ describe('App', () => {
     expect(screen.queryByText('Jordan Walke')).toBeInTheDocument();
     expect(screen.queryByText('Dan Abramov, Andrew Clark')).toBeInTheDocument();
     expect(screen.queryByText('Brendan Eich')).toBeNull();
-
+  
     fireEvent.change(screen.getByDisplayValue('react'), {
       target: {
         value: 'JavaScript',

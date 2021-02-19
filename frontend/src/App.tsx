@@ -84,11 +84,7 @@ const accountDataReducer = (state: AccountDataState, action: AccountDataAction):
     case 'ACCOUNT_DATA_FETCH_INIT':
       return { ...state, isLoading: true, isError: false };
     case 'ACCOUNT_DATA_FETCH_SUCCESS':
-      console.log(action.payload);
       const { header, content } = parse_account_json_to_table(action.payload);
-      console.log(header);
-
-      console.log(content);
       return { ...state, isLoading: false, isError: false };
     default:
       throw new Error();
@@ -179,7 +175,7 @@ const App = (): JSX.Element => {
           payload: result.data,
         });
       })
-      .catch(() => { console.log("account fetch failed") });
+      .catch(() => { });
   }, [demo as string]);
 
   React.useEffect(() => {
