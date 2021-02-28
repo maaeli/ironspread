@@ -38,3 +38,4 @@ test/tests/step_devs/__pycache__/__init__.cpython-38.pyc
 test/tests/test.xml
 
 *.pyc
+test/chromedriver
