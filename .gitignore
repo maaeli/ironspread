@@ -16,6 +16,7 @@ frontend/coverage
 
 # production
 frontend/build
+frontend/out
 
 # misc
 frontend/.DS_Store
