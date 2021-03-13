@@ -53,7 +53,7 @@ const mockSwitch = (
   } else if (url.includes('account_data')) {
     return Promise.resolve({
       data: {
-        account_names: { names: ['al', 'bl'] },
+        account_names: ['al', 'bl'],
         balances: [
           { date: 'one', balances: [4, 1.1] },
           { date: 'two', balances: [5, 8.9] },
@@ -108,7 +108,7 @@ describe('App', () => {
         if (url.includes('account_data')) {
           return Promise.resolve({
             data: {
-              account_names: { names: ['al', 'bl'] },
+              account_names: ['al', 'bl'],
               balances: [
                 { date: 'one', balances: [4, 1.1] },
                 { date: 'two', balances: [5, 8.9] },

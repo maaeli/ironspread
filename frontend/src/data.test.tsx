@@ -6,7 +6,7 @@ import { TableProps } from './Table';
 describe('parse_account_json_to_table', () => {
   test('parses json into header and table data', () => {
     const example_json_balances = {
-      account_names: { names: ['bank a', 'bank b', 'bank c'] },
+      account_names: ['bank a', 'bank b', 'bank c'],
       balances: [
         { date: 'May 2018', balances: [1.3, 5.6, 7.8] },
         { date: 'June 2018', balances: [-0.3, 2.1, 4.0] },

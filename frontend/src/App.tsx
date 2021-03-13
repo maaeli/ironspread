@@ -76,7 +76,7 @@ type AccountDataAction =
   | { type: 'ACCOUNT_DATA_FETCH_SUCCESS'; payload: AccountBalancesFromServer };
 
 type AccountDataState = {
-  tableData?: TableProps;
+  tableData: TableProps;
   isLoading: boolean;
   isError: boolean;
 };
@@ -89,7 +89,9 @@ const accountDataReducer = (
     case 'ACCOUNT_DATA_FETCH_INIT':
       return { ...state, isLoading: true, isError: false };
     case 'ACCOUNT_DATA_FETCH_SUCCESS':
+      console.log(action.payload);
       const tableData = parse_account_json_to_table(action.payload);
+      console.log(tableData);
       return { ...state, tableData, isLoading: false, isError: false };
     default:
       throw new Error();
@@ -131,6 +133,7 @@ const App = (): JSX.Element => {
   const [account_data, dispatch_account_data] = React.useReducer(
     accountDataReducer,
     {
+      tableData: { header: contentheader, content: content },
       isLoading: true,
       isError: false,
     },
@@ -215,7 +218,7 @@ const App = (): JSX.Element => {
         <p>Waiting for data ...</p>
       ) : (
         <>
-          <Table content={content} header={contentheader} />
+          <Table content={account_data.tableData.content} header={account_data.tableData.header} />
         </>
       )}
     </div>
