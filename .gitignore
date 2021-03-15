@@ -34,8 +34,10 @@ venv/
 backend/target
 backend/Cargo.lock
 Agent
-test/tests/step_devs/__pycache__/__init__.cpython-38.pyc
+test/tests/step_devs/__pycache__/*
 test/tests/test.xml
-
+**/__pycache__/*
 *.pyc
 test/chromedriver
+test/__pycache__/test_backend_api.cpython-38.pyc
+

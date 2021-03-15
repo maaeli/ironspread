@@ -218,7 +218,10 @@ const App = (): JSX.Element => {
         <p>Waiting for data ...</p>
       ) : (
         <>
-          <Table content={account_data.tableData.content} header={account_data.tableData.header} />
+          <Table
+            content={account_data.tableData.content}
+            header={account_data.tableData.header}
+          />
         </>
       )}
     </div>
