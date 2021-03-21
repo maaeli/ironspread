@@ -41,3 +41,4 @@ test/tests/test.xml
 test/chromedriver
 test/__pycache__/test_backend_api.cpython-38.pyc
 
+workspace.code-workspace
