@@ -32,4 +32,9 @@ describe('SearchForm', () => {
     fireEvent.submit(screen.getByRole('button'));
     expect(TestSearchFormProps.onSearchSubmit).toHaveBeenCalledTimes(1);
   });
+
+  test('renders snapshot', () => {
+    const { container } = render(<SearchForm {...TestSearchFormProps} />);
+    expect(container.firstChild).toMatchSnapshot();
+  });
 });
