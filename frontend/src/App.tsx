@@ -1,14 +1,15 @@
 import React, {
   FunctionComponent,
-  ReactChild,
-  ReactChildren,
   ReactElement,
   Dispatch,
   SetStateAction,
 } from 'react';
 import axios from 'axios';
 import Item, { article } from './Item';
+import SearchForm from './SearchForm';
+import Table, { TableProps } from './Table';
 import './App.css';
+import { parse_account_json_to_table, AccountBalancesFromServer } from './data';
 
 const DEMO_API_ENDPOINT = 'http://hn.algolia.com/api/v1/search?query=';
 
@@ -26,7 +27,7 @@ const useSemiPersistentState = (
   return [value as string, setValue as Dispatch<SetStateAction<string>>];
 };
 
-type Action =
+type StoriesAction =
   | { type: 'STORIES_FETCH_INIT' }
   | { type: 'STORIES_FETCH_SUCCESS'; payload: Array<article> }
   | { type: 'STORIES_FETCH_FAILURE' }
@@ -38,7 +39,10 @@ type StoriesState = {
   isError: boolean;
 };
 
-const storiesReducer = (state: StoriesState, action: Action): StoriesState => {
+const storiesReducer = (
+  state: StoriesState,
+  action: StoriesAction,
+): StoriesState => {
   switch (action.type) {
     case 'STORIES_FETCH_INIT':
       return { ...state, isLoading: true, isError: false };
@@ -67,6 +71,33 @@ const storiesReducer = (state: StoriesState, action: Action): StoriesState => {
   }
 };
 
+type AccountDataAction =
+  | { type: 'ACCOUNT_DATA_FETCH_INIT' }
+  | { type: 'ACCOUNT_DATA_FETCH_SUCCESS'; payload: AccountBalancesFromServer };
+
+type AccountDataState = {
+  tableData: TableProps;
+  isLoading: boolean;
+  isError: boolean;
+};
+
+const accountDataReducer = (
+  state: AccountDataState,
+  action: AccountDataAction,
+): AccountDataState => {
+  switch (action.type) {
+    case 'ACCOUNT_DATA_FETCH_INIT':
+      return { ...state, isLoading: true, isError: false };
+    case 'ACCOUNT_DATA_FETCH_SUCCESS':
+      console.log(action.payload);
+      const tableData = parse_account_json_to_table(action.payload);
+      console.log(tableData);
+      return { ...state, tableData, isLoading: false, isError: false };
+    default:
+      throw new Error();
+  }
+};
+
 type ListProps = {
   list: Array<article>;
   onRemoveItem: (item: article) => void;
@@ -83,144 +114,6 @@ const List: FunctionComponent<ListProps> = ({
   </>
 );
 
-type Table1props = {
-  header: Array<string>;
-  content: Array<Array<string>>;
-};
-
-const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-
-type TableHeaderProps = {
-  header: Array<string>;
-};
-
-const TableHeader: FunctionComponent<TableHeaderProps> = ({
-  header,
-}: TableHeaderProps): ReactElement => (
-  <thead key="head">
-    <tr key="labels">
-      <td key="corner1"></td>
-      {header.map((cell, columnNumber) => (
-        <td key={'label ' + columnNumber}>{alphabet[columnNumber]}</td>
-      ))}
-    </tr>
-    <tr key="headers">
-      <td key="corner2"></td>
-      {header.map((cell, columnNumber) => (
-        <td key={'header ' + columnNumber}>{cell}</td>
-      ))}
-    </tr>
-  </thead>
-);
-
-const Table1: FunctionComponent<Table1props> = ({
-  header,
-  content,
-}: Table1props): ReactElement => (
-  <table key="table">
-    <TableHeader header={header} />
-    <tbody key="body">
-      {content.map((row, rowNumber) => (
-        <tr key={'row' + rowNumber}>
-          <td>{rowNumber}</td>
-          {row.map((cell, columnNumber) => (
-            <td key={'cell ' + rowNumber + ',' + columnNumber}>
-              <input
-                type="text"
-                value={cell}
-                key={rowNumber + ',' + columnNumber}
-                name="name"
-                onChange={(event: React.ChangeEvent<HTMLInputElement>): void =>
-                  console.log(rowNumber, columnNumber, event.target.value)
-                }
-              />
-            </td>
-          ))}
-        </tr>
-      ))}
-    </tbody>
-  </table>
-);
-
-type InputWithLabelProps = {
-  id: string;
-  label?: string;
-  type?: string;
-  value: string;
-  isFocused: boolean;
-  onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  children?: ReactChild | ReactChildren;
-};
-
-const InputWithLabel: FunctionComponent<InputWithLabelProps> = ({
-  id,
-  label,
-  type = 'text',
-  value,
-  isFocused,
-  onInputChange,
-  children,
-}: InputWithLabelProps): ReactElement => {
-  const inputRef = React.useRef<HTMLInputElement>(null);
-  React.useEffect(() => {
-    if (isFocused && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isFocused]);
-  return (
-    <>
-      <label htmlFor={id} className="label">
-        {children}
-      </label>
-      &nbsp;
-      <input
-        ref={inputRef}
-        id={id}
-        type={type}
-        value={value}
-        autoFocus={isFocused}
-        onChange={onInputChange}
-        className="input"
-      />
-    </>
-  );
-};
-
-type SearchFormProps = {
-  searchTerm: string;
-  onSearchInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onSearchSubmit: (event: React.FormEvent) => void;
-};
-
-const SearchForm: FunctionComponent<SearchFormProps> = ({
-  searchTerm,
-  onSearchInput,
-  onSearchSubmit,
-}: SearchFormProps): ReactElement => (
-  <>
-    <form onSubmit={onSearchSubmit} className="search-form">
-      <InputWithLabel
-        id="search"
-        value={searchTerm as string}
-        isFocused
-        onInputChange={onSearchInput}
-      >
-        Search:
-      </InputWithLabel>
-      <button
-        type="submit"
-        disabled={!searchTerm}
-        className="button button_large"
-      >
-        Submit
-      </button>
-    </form>
-    <p>
-      Searching for <strong>{searchTerm}</strong>
-    </p>
-  </>
-);
-
 const contentheader = ['Alabel', 'Blabel', 'Clabel'];
 const content = [
   ['A1', 'B1', 'C1'],
@@ -230,14 +123,25 @@ const content = [
 /* eslint-disable max-lines-per-function */
 
 const App = (): JSX.Element => {
-  const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
+  const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'react');
   const [stories, dispatchStories] = React.useReducer(storiesReducer, {
     stories: [] as article[],
     isLoading: false,
     isError: false,
   });
 
+  const [account_data, dispatch_account_data] = React.useReducer(
+    accountDataReducer,
+    {
+      tableData: { header: contentheader, content: content },
+      isLoading: true,
+      isError: false,
+    },
+  );
+
   const [url, setUrl] = React.useState(`${DEMO_API_ENDPOINT}${searchTerm}`);
+
+  const demo = '';
 
   const handleSearchInput = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -262,7 +166,6 @@ const App = (): JSX.Element => {
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
     axios
       .get(url)
-      //.then((response) => response.json())
       .then((result) => {
         dispatchStories({
           type: 'STORIES_FETCH_SUCCESS',
@@ -270,11 +173,30 @@ const App = (): JSX.Element => {
         });
       })
       .catch(() => dispatchStories({ type: 'STORIES_FETCH_FAILURE' }));
-  }, [url]);
+  }, [url as string]);
+
+  const handleFetchAccountData = React.useCallback(() => {
+    dispatch_account_data({ type: 'ACCOUNT_DATA_FETCH_INIT' });
+    axios
+      .get('http://localhost:8081/account_data')
+      .then((result) => {
+        dispatch_account_data({
+          type: 'ACCOUNT_DATA_FETCH_SUCCESS',
+          payload: result.data,
+        });
+      })
+      .catch(() => {
+        console.log('Not yet implemented');
+      });
+  }, [demo as string]);
 
   React.useEffect(() => {
     handleFetchStories();
-  }, [url]);
+  }, [url as string]);
+
+  React.useEffect(() => {
+    handleFetchAccountData();
+  }, [demo as string]);
 
   return (
     <div className="container">
@@ -292,7 +214,16 @@ const App = (): JSX.Element => {
           <List list={stories.stories} onRemoveItem={handleRemoveStory} />
         </>
       )}
-      <Table1 content={content} header={contentheader} />
+      {account_data.isLoading ? (
+        <p>Waiting for data ...</p>
+      ) : (
+        <>
+          <Table
+            content={account_data.tableData.content}
+            header={account_data.tableData.header}
+          />
+        </>
+      )}
     </div>
   );
 };
@@ -300,11 +231,4 @@ const App = (): JSX.Element => {
 /* eslint-enable max-lines-per-function */
 
 export default App;
-export {
-  storiesReducer,
-  StoriesState,
-  Action,
-  SearchForm,
-  InputWithLabel,
-  List,
-};
+export { storiesReducer, StoriesState, StoriesAction, List };

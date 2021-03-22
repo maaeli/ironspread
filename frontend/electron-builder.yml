@@ -1,0 +1,4 @@
+appId: "ironspread.app"
+productName: "IronSpread"
+directories:
+  output: "out"

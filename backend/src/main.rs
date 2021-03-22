@@ -1,6 +1,8 @@
 use std::sync::Mutex;
 use serde::{Serialize};
+use actix_cors::Cors;
 use actix_web::{get, web, App, HttpServer, Responder};
+use actix_web::http::header;
 
 struct AppStateWithCounter {
     counter: Mutex<i32>,
@@ -12,10 +14,6 @@ struct Balance {
     balances: Vec<f32>,
 }
 
-//#[derive(Serialize, Debug)]
-//struct AccountNames {
-//    names: Vec<String>,
-//}
 type AccountNames = Vec<String>;
 
 #[derive(Serialize, Debug)]
@@ -52,7 +50,16 @@ async fn main() -> std::io::Result<()> {
     });
 
     HttpServer::new(move || {
+        //let cors = Cors::permissive();
+        let cors = Cors::default()
+        .allowed_origin("http://localhost:4000")
+        .allowed_methods(vec!["GET", "POST"])
+        .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
+        .allowed_header(header::CONTENT_TYPE)
+        .max_age(3600);
+
         App::new()
+            .wrap(cors)
             .app_data(counter.clone())
             .service(account_data)
             .route("/index", web::get().to(index))
