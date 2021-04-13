@@ -30,7 +30,7 @@ elif platform.system() == "Linux":
         this_file_as_path.parent.parent.parent.parent,
         "frontend",
         "out",
-        "IronSpread.AppImage",
+        "IronSpread-0.1.0.AppImage",
     )
 
 
