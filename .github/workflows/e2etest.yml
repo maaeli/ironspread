@@ -33,6 +33,7 @@ jobs:
     - name: Build frontend
       run: |
         cd ./frontend
+        npm ci
         npm run dist
         ls out
     - name: Get python dependencies
