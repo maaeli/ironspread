@@ -2,6 +2,7 @@ from subprocess import Popen
 from pathlib import PurePath
 import pytest
 from selenium import webdriver
+import platform
 
 this_file_as_path = PurePath(__file__)
 
@@ -13,16 +14,25 @@ server_application_path = PurePath(
     "ironspread",
 )
 
-electron_application_path = PurePath(
-    this_file_as_path.parent.parent.parent.parent,
-    "frontend",
-    "out",
-    "mac",
-    "IronSpread.app",
-    "Contents",
-    "MacOS",
-    "IronSpread",
-)
+if platform.system() == "Darwin":
+    electron_application_path = PurePath(
+        this_file_as_path.parent.parent.parent.parent,
+        "frontend",
+        "out",
+        "mac",
+        "IronSpread.app",
+        "Contents",
+        "MacOS",
+        "IronSpread",
+    )
+elif platform.system() == "Linux":
+    electron_application_path = PurePath(
+        this_file_as_path.parent.parent.parent.parent,
+        "frontend",
+        "out",
+        "IronSpread.AppImage",
+    )
+
 
 chrome_driver_path = PurePath(
     this_file_as_path.parent.parent.parent,

@@ -5,6 +5,9 @@ from subprocess import Popen
 from pathlib import PurePath
 import pytest
 import requests
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.common.by import By
 
 from pytest_bdd import scenarios, given, when, then, parsers
 
@@ -25,18 +28,22 @@ scenarios("../features/starting_app.feature")
 
 # Given Steps
 @given("the App has been started")
-def start_backend(backend, frontend):
-    """Minimal precondition for end to end test"""
+def start_app(backend, frontend):
+    """Minimal precondition for end to end test, just starts the fixtures"""
     pass
 
 
 # When Steps
 @when("I look at the GUI")
-def get_account_data(frontend):
+def look_at_gui(frontend):
+    """Minimal action, nothing really happens here"""
     pass
 
 
 # Then Steps
 @then("I see a table")
-def search_results(frontend):
-    pass
+def check_that_table_is_visible(frontend):
+    WebDriverWait(frontend, 20).until(
+        EC.presence_of_element_located((By.TAG_NAME, "table"))
+    )
+    assert frontend.find_element_by_tag_name("table").is_displayed()
