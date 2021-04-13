@@ -36,6 +36,10 @@ jobs:
         npm ci
         npm run dist
         ls out
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
     - name: Get python dependencies
       run: pip install -r requirements_dev.txt
     - name:
