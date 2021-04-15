@@ -46,10 +46,7 @@ class TestBackEndApi(unittest.TestCase):
             ]
             }
         """
-        # account_data = requests.get("http://localhost:8081/account_data")
-        account_data = requests.get(
-            "http://host.docker.internal:8081/account_data"
-        )
+        account_data = requests.get("http://localhost:8081/account_data")
         account_data_json = account_data.json()
         assert account_data_json["account_names"] == [
             "bank a",
