@@ -23,7 +23,11 @@ class TestBackEndApi(unittest.TestCase):
     def setUp(self):
         """Start the web server"""
         server_application_path = PurePath(
-            this_file_as_path.parent.parent, "backend", "target", "debug", "ironspread"
+            this_file_as_path.parent.parent,
+            "backend",
+            "target",
+            "debug",
+            "ironspread",
         )
         self.server_instance = Popen(server_application_path)
 
