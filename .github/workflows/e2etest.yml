@@ -44,6 +44,7 @@ jobs:
       run: pip install -r requirements_dev.txt
     - name:
       uses: GabrielBB/xvfb-action@v1
-      run: |
-        cd test
-        python run_tests.py
+      with:
+        working-directory: ./test
+        run: |
+          python run_tests.py
