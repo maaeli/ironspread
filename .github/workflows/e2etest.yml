@@ -46,5 +46,4 @@ jobs:
       uses: GabrielBB/xvfb-action@v1
       with:
         working-directory: ./test/tests
-        run: |
-          python -m pytest
+        run: pytest
