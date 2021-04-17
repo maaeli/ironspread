@@ -36,14 +36,19 @@ jobs:
         npm ci
         npm run dist
         ls out
+    - name: Setup xvfb (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get install -y xvfb libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xinput0 libxcb-xfixes0
+        # start xvfb in the background
+        sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
         python-version: '3.8'
     - name: Get python dependencies
       run: pip install -r requirements_dev.txt
-    - name:
-      uses: GabrielBB/xvfb-action@v1
-      with:
-        working-directory: ./test/tests
-        run: pytest
+    - name: Run tests
+      run: |
+        cd ./test/tests
+        pytest
