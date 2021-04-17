@@ -42,7 +42,7 @@ jobs:
     - name: Setup chromedriver
       uses: nanasess/setup-chromedriver@master
       with:
-        chromedriver-version: '87'
+        chromedriver-version: '87.0.4280.88'
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:

@@ -35,7 +35,7 @@ elif platform.system() == "Linux":
 
 
 chrome_driver_path = PurePath(
-    this_file_as_path.parent.parent.parent,
+    this_file_as_path.parent.parent.parent.parent,
     "chromedriver",
 )
 
