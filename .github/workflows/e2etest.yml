@@ -14,7 +14,7 @@ env:
 #    working-directory: ./backend
 
 jobs:
-  build and test:
+  build:
     defaults:
       run:
         working-directory: .
