@@ -40,7 +40,6 @@ jobs:
         # start xvfb in the background
         sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
     - name: Setup chromedriver
-      working-directory: ./test
       uses: nanasess/setup-chromedriver@master
       with:
         chromedriver-version: '87'
