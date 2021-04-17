@@ -43,6 +43,7 @@ jobs:
     - name: Get python dependencies
       run: pip install -r requirements_dev.txt
     - name:
+      uses: GabrielBB/xvfb-action@v1
       run: |
         cd test
         python run_tests.py
