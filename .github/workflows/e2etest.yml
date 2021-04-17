@@ -14,7 +14,7 @@ env:
 #    working-directory: ./backend
 
 jobs:
-  build:
+  build and test:
     defaults:
       run:
         working-directory: .
@@ -47,4 +47,4 @@ jobs:
       with:
         working-directory: ./test/tests
         run: |
-          pytest
+          python -m pytest
