@@ -2,3 +2,4 @@ pylint
 requests
 pytest
 pytest-bdd
+selenium
