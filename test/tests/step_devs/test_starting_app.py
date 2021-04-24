@@ -10,6 +10,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
 
 from pytest_bdd import scenarios, given, when, then, parsers
+from table_parser.table_parser import table_parser
 
 this_file_as_path = PurePath(__file__)
 server_application_path = PurePath(
@@ -47,3 +48,20 @@ def check_that_table_is_visible(frontend):
         EC.presence_of_element_located((By.TAG_NAME, "table"))
     )
     assert frontend.find_element_by_tag_name("table").is_displayed()
+
+
+@then(parsers.parse("I see a table with the header\n{header}"))
+def check_table_header(frontend, header):
+    expected_table_header = table_parser(header)
+    table = WebDriverWait(frontend, 20).until(
+        EC.presence_of_element_located((By.TAG_NAME, "table"))
+    )
+    table_header = table.find_element_by_tag_name("thead")
+    header_rows = table_header.find_elements_by_tag_name("tr")
+    header_dict = {key: [] for key in expected_table_header}
+    header_dict_keys = list(header_dict.keys())
+    for row in header_rows:
+        cells = row.find_elements_by_tag_name("td")
+        for cell_number, cell in enumerate(cells):
+            header_dict[header_dict_keys[cell_number]].append(cell.text)
+    assert header_dict == expected_table_header

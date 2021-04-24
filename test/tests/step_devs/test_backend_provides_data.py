@@ -37,6 +37,6 @@ def search_results(response, key, value):
 
 
 @then(parsers.parse("the only keys in the result are {keys}"))
-def search_results(response, keys):
+def search_results_keys(response, keys):
     response_json = response["response"].json()
     assert set(response_json.keys()) == set(json.loads(keys))

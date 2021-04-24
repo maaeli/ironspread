@@ -8,3 +8,11 @@ Feature: Last data is reloaded
     Given the App has been started
     When I look at the GUI
     Then I see a table
+
+  Scenario: Initial table content
+    Given the App has been started
+    When I look at the GUI
+    Then I see a table with the header
+      | column 0 | column 1 | column 2 | column 3 |
+      | |  A | B | C |
+      | | bank a | bank b | bank c | 

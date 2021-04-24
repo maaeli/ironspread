@@ -2,4 +2,5 @@ pylint
 requests
 pytest
 pytest-bdd
+bbd-table-parser
 selenium
