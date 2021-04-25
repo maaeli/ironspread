@@ -43,7 +43,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "pack": "electron-builder --dir",
-    "dist": "webpack --config webpack.react.config.js && webpack --config webpack.electron.config.js && electron-builder"
+    "dist": "webpack --config webpack.react.config.js && webpack --config webpack.electron.config.js && electron-builder -c.mac.identity=null"
   },
   "eslintConfig": {
     "extends": [
