@@ -39,7 +39,7 @@ const Table: FunctionComponent<TableProps> = ({
     <tbody key="body">
       {content.map((row, rowNumber) => (
         <tr key={'row' + rowNumber}>
-          <td>{rowNumber}</td>
+          <td>{rowNumber + 1}</td>
           {row.map((cell, columnNumber) => (
             <td key={'cell ' + rowNumber + ',' + columnNumber}>
               <input
