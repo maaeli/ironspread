@@ -9,10 +9,15 @@ Feature: Last data is reloaded
     When I look at the GUI
     Then I see a table
 
-  Scenario: Initial table content
+  Scenario: Initial table header
     Given the App has been started
     When I look at the GUI
     Then I see a table with the header
       | column 0 | column 1 | column 2 | column 3 |
       | |  A | B | C |
       | | bank a | bank b | bank c | 
+
+  Scenario: Initial table row label
+    Given the App has been started
+    When I look at the GUI
+    Then I see a table with the row labels '1','2'

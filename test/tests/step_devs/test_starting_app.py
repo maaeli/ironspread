@@ -65,3 +65,17 @@ def check_table_header(frontend, header):
         for cell_number, cell in enumerate(cells):
             header_dict[header_dict_keys[cell_number]].append(cell.text)
     assert header_dict == expected_table_header
+
+
+@then(parsers.parse("I see a table with the row labels {labels}"))
+def check_row_lables(frontend, labels):
+    labels_expected = [label.strip("'") for label in labels.split(",")]
+    table = WebDriverWait(frontend, 20).until(
+        EC.presence_of_element_located((By.TAG_NAME, "table"))
+    )
+    table_body = table.find_element_by_tag_name("tbody")
+    body_rows = table_body.find_elements_by_tag_name("tr")
+    row_labels = []
+    for row in body_rows:
+        row_labels.append(row.find_elements_by_tag_name("td")[0].text)
+    assert row_labels == labels_expected
