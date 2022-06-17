@@ -79,7 +79,7 @@
     "@testing-library/user-event": "^12.6.3",
     "@types/webpack-env": "^1.16.0",
     "css-loader": "^5.0.2",
-    "electron": "^11.3.0",
+    "electron": "^15.5.5",
     "electron-builder": "^22.9.1",
     "eslint": "^7.19.0",
     "eslint-config-prettier": "^7.2.0",
